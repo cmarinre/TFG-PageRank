@@ -29,7 +29,7 @@ def power_method(matrix, max_iterations=100, tolerance=1e-6):
 
     return vector
 
-# Ejemplo de uso
+# Ejemplo de uso 
 if __name__ == "__main__":
     # Definición de una matriz de ejemplo
     A = np.array([[1/2, 1/3, 0],
