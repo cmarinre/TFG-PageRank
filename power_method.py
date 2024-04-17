@@ -1,12 +1,14 @@
 import numpy as np
 import time
-from funciones_comunes import generarMatrizAleatoria, matrizPageRank
+# from funciones_comunes import generarMatrizAleatoria, matrizPageRank
 
-def power_method(matrix, max_iterations=50000, tolerance=0.000005):
+def power_method(matrix, max_iterations=50000, tolerance=0.00000005):
     # Obtenemos la dimensión de la matriz
     n = len(matrix)
     # Generamos un vector aleatorio de tamaño n
-    vector = np.random.rand(n)
+    # vector = np.random.rand(n)
+    vector = [0]*n
+    vector[1] = 1
     # vector = [1,0,0]
     # Lo normalizamos dividiendo por la norma 1 (suma de las componentes)
     vector /= np.linalg.norm(vector, ord=1)
@@ -26,6 +28,37 @@ def power_method(matrix, max_iterations=50000, tolerance=0.000005):
 
         # Guardamos el vector nuevo
         vector = new_vector
+        # print(vector)
+
+    return vector, i
+
+def power_method_convergence(matrix, max_iterations=50000, tolerance=0.000000001):
+    # Obtenemos la dimensión de la matriz
+    n = len(matrix)
+    # Generamos un vector aleatorio de tamaño n
+    vector = np.random.rand(n)
+    # vector = [0]*n
+    # vector[1] = 1    
+    # Lo normalizamos dividiendo por la norma 1 (suma de las componentes)
+    vector /= np.linalg.norm(vector, ord=1)
+
+
+    # Ejecutamos el método de las potencias y paramos cuando el número de iteraciones sea el máximo
+    # O cuando cumple el factor de tolerancia
+    for i in range(max_iterations):
+        # Multiplicación de la matriz por el vector
+        matrix_vector_product = np.dot(matrix, vector)
+        # Cálculo del nuevo vector
+        new_vector = matrix_vector_product / np.linalg.norm(matrix_vector_product, ord=1)
+
+        # print("Nuevo vector power method ",new_vector)
+        # print("Viejo vector power method ",vector)
+        # Comprobación de convergencia
+        if all(valor < tolerance for valor in (new_vector-vector)):
+            break
+
+        # Guardamos el vector nuevo
+        vector = new_vector
 
     return vector, i
 
@@ -39,7 +72,7 @@ if __name__ == "__main__":
     #               [1/2, 0, 1/2, 0]])
 
     print("Creando matriz")
-    A= matrizPageRank(20000)
+    # A= matrizPageRank(20000)
     # A= generarMatrizAleatoria(5000)
     print("matriz generada")
 

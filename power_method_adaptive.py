@@ -1,8 +1,8 @@
 import numpy as np
 import time
-from funciones_comunes import generarMatrizAleatoria, matrizPageRank
+# from funciones_comunes import generarMatrizAleatoria, matrizPageRank
 
-def adaptive_power_method(matrix, max_iterations=50000, tolerance=0.000005):
+def adaptive_power_method(matrix, max_iterations=50000, tolerance=0.000000001):
 
     # Obtenemos la dimensión de la matriz
     n = len(matrix)
@@ -13,7 +13,8 @@ def adaptive_power_method(matrix, max_iterations=50000, tolerance=0.000005):
 
     # Generamos un vector aleatorio de tamaño n
     vector = np.random.rand(n)
-
+    # vector = [0]*n
+    # vector[1] = 1
     # Lo normalizamos dividiendo por la norma 1 (suma de las componentes)
     vector /= np.linalg.norm(vector, ord=1)
 
@@ -26,38 +27,44 @@ def adaptive_power_method(matrix, max_iterations=50000, tolerance=0.000005):
     # En cada iteración
     for j in range(max_iterations):
 
+        # print("antes", x_k)
         # Calculamos el nuevo vector
         x_k1 = np.dot(matrix_Aii, x_k) + x_kii
 
+
         # Dividimos por su norma, que será 1.
-        x_k1 = x_k1 / np.linalg.norm(x_k1, ord=1)
+        # print(np.linalg.norm(x_k1, ord=1))
+        # x_k1 = x_k1 / np.linalg.norm(x_k1, ord=1)
 
         # Comprobamos componente por componente si ha cumplido el criterio de convergencia.
-        # En los que lo haya cumplido, la fila la ponemos a 0, en el vector estandar ponemos a 0 tb esta componente
+        # En los que lo haya cumplido, la fila la ponemos a 0
         # Y en el nuevo vector ponemos el valor y ya no lo tocamos nunca más
         
         # Para cada componente
         for i in range(len(vector)):
             # Si la componente no había cumplido ya el criterio de convergencia
             if converg_comp[i]==0:
-                # Y lo acaba de cumplir
+                # Si la cumple ahora
                 resta = abs(x_k1[i] - x_k[i])
-                if  resta < tolerance and x_k1[i]!=0 and x_k[i] !=0:
+                if  resta < tolerance:
                     # Lo apuntamos en el vector de convergencia
                     converg_comp[i] = 1
-                    # Ponemos en x_k esa componente a 0 y en el x_kii a su valor
+                    # Ponemos en el x_kii a su valor
                     x_kii[i] = x_k1[i]
-                    x_k1[i] = 0
                     # Y en la matriz esa fila a 0
                     matrix_Aii[i] = [0] * len(matrix_Aii[i])
 
-
-        # Comprobación de convergencia
-        if converg_comp==converg_comp_final or np.linalg.norm((x_k - x_k1), ord=1)< tolerance:
-            break
-
+        # print("Nuevo vector adaptive method ",x_k1)
+        # print("El que ya ha cumplido vector adaptive method ",x_kii)
+        # print("Viejo vector adaptive method ",x_k)
+        
         # Guardamos el vector nuevo
         x_k = x_k1
+
+        # Comprobación de convergencia
+        if converg_comp==converg_comp_final :
+            break
+
 
     return x_k, j
 
@@ -71,7 +78,7 @@ if __name__ == "__main__":
     #               [1/2, 0, 1/2, 0]])
 
     print("Creando matriz")
-    A= matrizPageRank(20000)
+    # A= matrizPageRank(20000)
     # A= generarMatrizAleatoria(5000)
     print("matriz generada")
 
