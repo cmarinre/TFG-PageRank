@@ -106,7 +106,7 @@ if __name__ == "__main__":
     #               [1/2, 0, 1/2, 0]])
 
     print("Creando matriz")
-    A = matrizPageRank(10000)
+    A = matrizPageRank(1500)
     print("Matriz creada")
 
     comparacionPowersMult(A)

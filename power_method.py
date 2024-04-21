@@ -37,14 +37,16 @@ def power_method(matrix, max_iterations=50000, tolerance=0.000000000001):
     # Ejecutamos el método de las potencias y paramos cuando el número de iteraciones sea el máximo
     # O cuando cumple el factor de tolerancia
     for i in range(max_iterations):
+
         # Multiplicación de la matriz por el vector
-        matrix_vector_product = multiplicacionMatrizVector(matrix, vector)
+        new_vector = multiplicacionMatrizVector(matrix, vector)
         
-        # Cálculo del nuevo vector
-        new_vector = matrix_vector_product / np.linalg.norm(matrix_vector_product, ord=1)
+        # Aquí deberíamos dividir por la norma pero la norma siempre es 1.
+        # new_vector = new_vector / np.linalg.norm(new_vector, ord=1)
 
         # Comprobación de convergencia
-        if np.linalg.norm(new_vector - vector, ord=1) < tolerance:
+        resta = [new_vector[i] - vector[i] for i in range(min(len(new_vector), len(vector)))]
+        if np.linalg.norm(resta, ord=1) < tolerance:
             break
 
         # Guardamos el vector nuevo
