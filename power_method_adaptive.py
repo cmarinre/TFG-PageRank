@@ -1,20 +1,44 @@
 import numpy as np
-import time
-# from funciones_comunes import generarMatrizAleatoria, matrizPageRank
 
-def adaptive_power_method(matrix, max_iterations=50000, tolerance=0.000000001):
+
+# Función para multiplicar una matriz y un vector sabiendo que algunas filas de la matriz están completamente a cero.
+# A es la matriz, v el vector y ceros el vector que tiene un 0 en las filas de A normales y un 1 en la posición de las filas que están a 0
+def multiplicacionMatrizVectorConCeros(A, v, ceros):
+
+    #Guardamos la dim de la matriz
+    n = len(A)
+
+    #Comprobamos que se puedan multiplicar
+    if n != len(v):
+        print("No se puede multiplicar esta matriz y este vector.")
+        return None
+    
+    # Inicializamos el vector resultado 
+    resultado = [0] * n
+    
+    # Multiplicamos la matriz por el vector si la fila del vector no está completa a 0
+    for i in range(n):
+        # Si la fila está completa a 0, ponemos ese valor directamente a 0
+        if ceros[i]!=0:
+            resultado[i] = 0
+        #Si no, multiplicamos normal
+        else:
+            for j in range(n):
+                resultado[i] += A[i][j] * v[j]
+    return resultado
+
+#Método de las potencias adaptado, multiplcando la matriz con nuestra función especial
+def adaptive_power_method(matrix, max_iterations=50000, tolerance=0.000000000001):
 
     # Obtenemos la dimensión de la matriz
     n = len(matrix)
 
     # Vector de convergencia de componentes
     converg_comp = [0] * n
-    converg_comp_final = [1] * n
 
     # Generamos un vector aleatorio de tamaño n
     vector = np.random.rand(n)
-    # vector = [0]*n
-    # vector[1] = 1
+
     # Lo normalizamos dividiendo por la norma 1 (suma de las componentes)
     vector /= np.linalg.norm(vector, ord=1)
 
@@ -27,19 +51,14 @@ def adaptive_power_method(matrix, max_iterations=50000, tolerance=0.000000001):
     # En cada iteración
     for j in range(max_iterations):
 
-        # print("antes", x_k)
-        # Calculamos el nuevo vector
-        x_k1 = np.dot(matrix_Aii, x_k) + x_kii
-
-
-        # Dividimos por su norma, que será 1.
-        # print(np.linalg.norm(x_k1, ord=1))
-        # x_k1 = x_k1 / np.linalg.norm(x_k1, ord=1)
+        # Calculamos el nuevo vector. Primero mutiplicando A por el vector y luego sumandole el vector de las componentes que ya han convergido
+        x_k1 = multiplicacionMatrizVectorConCeros(matrix_Aii, x_k, converg_comp)
+        x_k1 = [x_k1[i] + x_kii[i] for i in range(min(len(x_k1), len(x_kii)))]
 
         # Comprobamos componente por componente si ha cumplido el criterio de convergencia.
         # En los que lo haya cumplido, la fila la ponemos a 0
         # Y en el nuevo vector ponemos el valor y ya no lo tocamos nunca más
-        
+
         # Para cada componente
         for i in range(len(vector)):
             # Si la componente no había cumplido ya el criterio de convergencia
@@ -53,48 +72,18 @@ def adaptive_power_method(matrix, max_iterations=50000, tolerance=0.000000001):
                     x_kii[i] = x_k1[i]
                     # Y en la matriz esa fila a 0
                     matrix_Aii[i] = [0] * len(matrix_Aii[i])
-
-        # print("Nuevo vector adaptive method ",x_k1)
-        # print("El que ya ha cumplido vector adaptive method ",x_kii)
-        # print("Viejo vector adaptive method ",x_k)
         
-        # Guardamos el vector nuevo
-        x_k = x_k1
 
         # Comprobación de convergencia
-        if converg_comp==converg_comp_final :
+        resta = [abs(x_k1[i] - x_kii[i]) for i in range(min(len(x_k1), len(x_kii)))]
+        if all(abs(valor) < tolerance for valor in (resta)):
             break
 
+        # Guardamos el vector nuevo
+        x_k = x_k1
 
     return x_k, j
 
 
-# Ejemplo de uso 
 if __name__ == "__main__":
-   # Definición de una matriz de ejemplo
-    # A = np.array([[1/2, 1/3, 0, 0],
-    #               [0, 1/3, 0, 1],
-    #               [0, 1/3, 1/2, 0],
-    #               [1/2, 0, 1/2, 0]])
-
-    print("Creando matriz")
-    # A= matrizPageRank(20000)
-    # A= generarMatrizAleatoria(5000)
-    print("matriz generada")
-
-    # Registro del tiempo de inicio
-    start_time = time.time()
-
-    # Aplicación del método de las potencias
-    eigenvector, num_it = adaptive_power_method(A)
-
-    # Registro del tiempo de finalización
-    end_time = time.time()
-
-    # Cálculo del tiempo transcurrido
-    elapsed_time = end_time - start_time
-
-    # print("Vector propio correspondiente:", eigenvector)
-    print("El tiempo de ejecución fue de: {:.5f} segundos".format(elapsed_time))
-    print("Número de iteraciones:", num_it)
-    print("Suma de los valores del vector propio para asegurar que su norma 1 es igual a 1:", np.sum(eigenvector))
+    print("Aquí no hay código. Vaya a funciones_comunes.py, por favor.")
