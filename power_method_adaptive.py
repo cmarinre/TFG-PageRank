@@ -1,31 +1,6 @@
 import numpy as np
+from funciones_comunes import multiplicacionMatrizVectorConCeros
 
-
-# Función para multiplicar una matriz y un vector sabiendo que algunas filas de la matriz están completamente a cero.
-# A es la matriz, v el vector y ceros el vector que tiene un 0 en las filas de A normales y un 1 en la posición de las filas que están a 0
-def multiplicacionMatrizVectorConCeros(A, v, ceros):
-
-    #Guardamos la dim de la matriz
-    n = len(A)
-
-    #Comprobamos que se puedan multiplicar
-    if n != len(v):
-        print("No se puede multiplicar esta matriz y este vector.")
-        return None
-    
-    # Inicializamos el vector resultado 
-    resultado = [0] * n
-    
-    # Multiplicamos la matriz por el vector si la fila del vector no está completa a 0
-    for i in range(n):
-        # Si la fila está completa a 0, ponemos ese valor directamente a 0
-        if ceros[i]!=0:
-            resultado[i] = 0
-        #Si no, multiplicamos normal
-        else:
-            for j in range(n):
-                resultado[i] += A[i][j] * v[j]
-    return resultado
 
 #Método de las potencias adaptado, multiplcando la matriz con nuestra función especial
 def adaptive_power_method(matrix, max_iterations=50000, tolerance=0.000000000001):
@@ -86,4 +61,4 @@ def adaptive_power_method(matrix, max_iterations=50000, tolerance=0.000000000001
 
 
 if __name__ == "__main__":
-    print("Aquí no hay código. Vaya a funciones_comunes.py, por favor.")
+    print("Aquí no hay código. Vaya a comparacion_powers.py, por favor.")

@@ -1,8 +1,4 @@
-import time
 import numpy as np
-
-from power_method import power_method, power_method_convergence
-from power_method_adaptive import adaptive_power_method
 
 # Función para la generación de una matriz dado un tamaño, que se parezca a una matriz de enlaces.
 # Intentamos establecer el número de enlaces salientes de cada página y ponerlos aleatoriamente en páginas distintas.
@@ -29,87 +25,125 @@ def matrizPageRank(n):
     
     return matrix
 
+# Función para multiplicar dos matrices.
+def multiplicacionDosMatrices(A, B):
 
-# Función que compara los métodos de potencias y potencias adaptado, mirando la convergencia del primero
-# como la convergencia de la norma.
-def comparacionPowers(A):
-
-    # Registro del tiempo de inicio
-    start_time1 = time.time()
-    # Aplicación del método de las potencias
-    eigenvector1, num_it1 = power_method(A)
-    # Registro del tiempo de finalización
-    end_time1 = time.time()
-    # Cálculo del tiempo transcurrido
-    elapsed_time1 = end_time1 - start_time1
-
-    print("El tiempo de ejecución de power fue de: {:.5f} segundos".format(elapsed_time1))
-    print("Número de iteraciones:", num_it1)
-    print("Suma de los valores del vector propio para asegurar que su norma 1 es igual a 1:", np.sum(eigenvector1))
-    print("Vector propio:", eigenvector1[0])
-
-    # Registro del tiempo de inicio
-    start_time2 = time.time()
-
-    # Aplicación del método de las potencias adaptado
-    eigenvector2, num_it2 = adaptive_power_method(A)
-    # Registro del tiempo de finalización
-    end_time2 = time.time()
-    # Cálculo del tiempo transcurrido
-    elapsed_time2 = end_time2 - start_time2
-
-    print("El tiempo de ejecución de adaptive fue de: {:.5f} segundos".format(elapsed_time2))
-    print("Número de iteraciones:", num_it2)
-    print("Suma de los valores del vector propio para asegurar que su norma 1 es igual a 1:", np.sum(eigenvector2))
-    print("Vector propio:", eigenvector2[0])
-
-
-
-# Función que compara los métodos de potencias y potencias adaptado, mirando la convergencia del primero
-# como la convergencia de sus componentes.
-def comparacionPowersMult(A):
-
-    # Registro del tiempo de inicio
-    start_time1 = time.time()
-    # Aplicación del método de las potencias
-    eigenvector1, num_it1 = power_method_convergence(A)
-    # Registro del tiempo de finalización
-    end_time1 = time.time()
-    # Cálculo del tiempo transcurrido
-    elapsed_time1 = end_time1 - start_time1
-
-    print("El tiempo de ejecución de power fue de: {:.5f} segundos".format(elapsed_time1))
-    print("Número de iteraciones:", num_it1)
-    print("Suma de los valores del vector propio para asegurar que su norma 1 es igual a 1:", np.sum(eigenvector1))
-    print("Vector propio:", eigenvector1[1])
-
-    # Registro del tiempo de inicio
-    start_time2 = time.time()
-    # Aplicación del método de las potencias adaptado
-    eigenvector2, num_it2 = adaptive_power_method(A)
-    # Registro del tiempo de finalización
-    end_time2 = time.time()
-    # Cálculo del tiempo transcurrido
-    elapsed_time2 = end_time2 - start_time2
-
-    print("El tiempo de ejecución de adaptive fue de: {:.5f} segundos".format(elapsed_time2))
-    print("Número de iteraciones:", num_it2)
-    print("Suma de los valores del vector propio para asegurar que su norma 1 es igual a 1:", np.sum(eigenvector2))
-    print("Vector propio:", eigenvector2[1])
-
-
-
-if __name__ == "__main__":
-    # A = np.array([[1/2, 1/3, 0, 0],
-    #               [0, 1/3, 0, 1],
-    #               [0, 1/3, 1/2, 0],
-    #               [1/2, 0, 1/2, 0]])
-
-    print("Creando matriz")
-    A = matrizPageRank(1500)
-    print("Matriz creada")
-
-    comparacionPowersMult(A)
-    comparacionPowers(A)
+    #Comprobamos que se puedan multiplicar
+    if len(A[0]) != len(B):
+        print("No se puede multiplicar estas matrices.")
+        return None
     
+    # Inicializamos el vector resultado 
+    resultado = [[0] * len(B[0]) for _ in range(len(A))]
+    
+    # Multiplicamos las matrices
+    for i in range(len(A)):
+        for j in range(len(B[0])):
+            for k in range(len(B)):
+                resultado[i][j] += A[i][k] * B[k][j]
 
+    return resultado
+
+# Función para multiplicar una matriz y un vector.
+def multiplicacionMatrizVector(A, v):
+    #Guardamos la dim de la matriz
+    n = len(A)
+
+    #Comprobamos que se puedan multiplicar
+    if n != len(v):
+        print("No se puede multiplicar esta matriz y este vector.")
+        return None
+    
+    # Inicializamos el vector resultado 
+    resultado = [0] * n
+    
+    # Multiplicamos la matriz por el vector
+    for i in range(n):
+        for j in range(n):
+            resultado[i] += A[i][j] * v[j]
+    
+    return resultado
+
+# Función para multiplicar una matriz y un vector sabiendo que algunas filas de la matriz están completamente a cero.
+# A es la matriz, v el vector y ceros el vector que tiene un 0 en las filas de A normales y un 1 en la posición de las filas que están a 0
+def multiplicacionMatrizVectorConCeros(A, v, ceros):
+
+    #Guardamos la dim de la matriz
+    n = len(A)
+
+    #Comprobamos que se puedan multiplicar
+    if n != len(v):
+        print("No se puede multiplicar esta matriz y este vector.")
+        return None
+    
+    # Inicializamos el vector resultado 
+    resultado = [0] * n
+    
+    # Multiplicamos la matriz por el vector si la fila del vector no está completa a 0
+    for i in range(n):
+        # Si la fila está completa a 0, ponemos ese valor directamente a 0
+        if ceros[i]!=0:
+            resultado[i] = 0
+        #Si no, multiplicamos normal
+        else:
+            for j in range(n):
+                resultado[i] += A[i][j] * v[j]
+    return resultado
+
+# Función para multiplicar dos vectores.
+def multiplicacionDosVectores(V1, V2):
+    #Guardamos la dim de la matriz
+    n = len(V1)
+
+    #Comprobamos que se puedan multiplicar
+    if n != len(V2):
+        print("No se puede multiplicar esta matriz y este vector.")
+        return None
+    
+    # Inicializamos el vector resultado 
+    resultado = 0
+    
+    # Multiplicamos la matriz por el vector
+    for i in range(n):
+        resultado += V1[i] * V2[i]
+    
+    return resultado
+    
+# Función para multiplicar un valor por un vector.
+def multiplicacionValorVector(k, v):
+
+    n = len(v)
+    # Inicializamos el vector resultado 
+    resultado = [0] * n
+    # Multiplicamos la matriz por el vector
+    for i in range(n):
+        resultado[i] = k * v[i]
+
+    return resultado
+
+# Función para multiplicar una matriz cuadrada por un valor.
+def multiplicacionValorMatriz(k, A):
+    filas = len(A)
+    columnas = len(A[0])
+    for i in range(filas):
+        for j in range(columnas):
+            A[i][j] = A[i][j]*k
+
+    return A
+
+# Función para sumar dos matrices.
+def sumaDosMatrices(A, B):
+    filas = len(A)
+    columnas = len(A[0])
+    for i in range(filas):
+        for j in range(columnas):
+            A[i][j] = A[i][j] + B[i][j]
+    return A
+
+    
+def modificarMatriz(A, alpha):
+
+    n = len(A)
+    S = [[1/n] * (n) for _ in range(n)]
+    M = multiplicacionValorMatriz(alpha, A) + multiplicacionValorMatriz((1-alpha), S)
+    return M

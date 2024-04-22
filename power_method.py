@@ -1,24 +1,5 @@
 import numpy as np
-
-# Función para multiplicar una matriz y un vector.
-def multiplicacionMatrizVector(A, v):
-    #Guardamos la dim de la matriz
-    n = len(A)
-
-    #Comprobamos que se puedan multiplicar
-    if n != len(v):
-        print("No se puede multiplicar esta matriz y este vector.")
-        return None
-    
-    # Inicializamos el vector resultado 
-    resultado = [0] * n
-    
-    # Multiplicamos la matriz por el vector
-    for i in range(n):
-        for j in range(n):
-            resultado[i] += A[i][j] * v[j]
-    
-    return resultado
+from funciones_comunes import multiplicacionMatrizVector
 
 # Método de las potencias estándar, calculando la convergencia con la norma 1
 # y multiplicando la matriz con nuestra función definida arriba
@@ -89,4 +70,4 @@ def power_method_convergence(matrix, max_iterations=50000, tolerance=0.000000000
 
 # Ejemplo de uso 
 if __name__ == "__main__":
-    print("Aquí no hay código. Vaya a funciones_comunes.py, por favor.")
+    print("Aquí no hay código. Vaya a comparacion_powers.py, por favor.")
