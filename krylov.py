@@ -1,6 +1,7 @@
 
 import numpy as np
 from funciones_comunes import matrizPageRank, sumaDosMatrices, multiplicacionDosVectores, multiplicacionMatrizVector, multiplicacionValorVector, multiplicacionDosMatrices, modificarMatriz, multiplicacionValorMatriz
+from scipy.sparse.linalg import gmres
 
 # Dada una matriz A y un vector v, generará una base ortonormal del 
 # subespacio de Krylov K_n(A,v). Generará n vectores, ortonormales entre sí. 
@@ -9,7 +10,7 @@ def arnoldi(A, v, num_columnas):
     N = len(A)
     # Generamos una matriz V y una h con todos sus valores a 0
     V = [[0] * (N) for _ in range(num_columnas)]
-    h = [[0] * (num_columnas) for _ in range(num_columnas)]
+    h = [[0] * (num_columnas-1) for _ in range(num_columnas)]
     # Establecemos el v_1 al vector inicial normalizado.
     V[0] = v / np.linalg.norm(v, ord=2)
     
@@ -35,71 +36,268 @@ def arnoldi(A, v, num_columnas):
     # print(n)
     # print(i)
     return V,h
+
+def rotacionesGivens(H, r0):
+
+    N = len(H)
+    h = H
+
+    print("h", h)
+    g = [0]*(N)
+    g[0] = r0
+    for n in range(0,N):  
+        for i in range(0,n):
+            c_i = abs(h[i][i]) / (np.sqrt( h[i][i]*h[i][i] + h[i+1][i]*h[i+1][i]  ))
+            s_i = (h[i+1][i] / h[i][i])*c_i
+            h[i][n] = c_i*h[i][n] + s_i*h[i+1][n]
+            h[i+1][n] = -s_i*h[i][n] + c_i*h[i+1][n]
+        c_n = abs(h[n][n]) / (np.sqrt( h[n][n]*h[n][n] + h[n+1][n]*h[n+1][n]  ))
+        s_n = (h[n+1][n] / h[n][n])*c_n
+        h[n][n] = c_n*h[n][n] + s_n*h[n+1][n]
+        h[n+1][n] = 0
+        g[n] = c_n*g[n]
+        g[n+1] = -s_n*g[n]
+    h = h[:-1, :]
+
+
+def GMRES(A, alpha, max_it, tol):
+
+
+    M = modificarMatriz(A, alpha)
+    N = len(A)
+
+    # Ax=b
     
+    # Nuestro sistema es de la forma (I-alphaA)x = (1-alpha)v
 
-def comprobacionArnoldi():
-    # A = np.array([[1/2, 1/3, 0, 0],
-    #             [0, 1/3, 0, 1],
-    #             [0, 1/3, 1/2, 0],
-    #             [1/2, 0, 1/2, 0]])
-    print("Creando matriz")
-    A = matrizPageRank(10)
-    print("matriz creada")
+    # Necesitamos un vector inicial x_0
+    x_0 = np.random.rand(N)
 
-    M = modificarMatriz(A, 0.85)
+    # Nuestro vector b, que en nuestro caso es (1-alpha)v
+    v = np.ones(N) / N
+    b = multiplicacionValorVector(1-alpha, v)
+    print("b", b)
     
-    N = len(M)
-    num_cols = 8
-    randomv = np.random.rand(N)
-    V, H = arnoldi(M, randomv, num_cols)
+    # Nuestra matriz, que es (I-alpha(A))
+    Matriz = np.eye(N) - np.array(multiplicacionValorMatriz(alpha, A))
+    print("matriz", Matriz)
 
-    V = np.array(V)
-    H = np.array(H)
-    # print("V", V)
-    # print("H", H)
+    # Y nuestro vector r_0, b-Ax_0
+    Matx0 = multiplicacionMatrizVector(Matriz, x_0)
+    print("Matx0", Matx0)
+
+    r_0 = np.array(b) - np.array(Matx0)
+    print("r_0", r_0)
+
+    #Establecemos el máximo de iteraciones
+    num_columnas = max_it
+
+    # Generamos una matriz V y una h con todos sus valores a 0
+    V = np.zeros((N, num_columnas+1))
+    h = np.zeros((num_columnas+1, num_columnas))
+
+    # Establecemos el v_1 al vector inicial normalizado.
+    r_0_norm = np.linalg.norm(r_0, ord=2)
+    V[:, 0] = np.array(r_0 / r_0_norm)
+
+    # Inicializamos el vector g
+    g = np.zeros(num_columnas+1)
+    g[0] = r_0_norm
+ 
+    # Guardamos la norma para no repetir la operación en cada bucle
+    b_norm = np.linalg.norm(b, ord=2)
+
+    # Vector solucion
+    x = np.zeros(N)
+
+    N = N-1
+    num_columnas = num_columnas - 1
 
 
-    # Trasponemos V porque nos va a hacer falta traspuesta
-    Vtrasp = np.transpose(V)
+    n=0
+    while n<=(num_columnas):
+        print("n", n)
+        t = multiplicacionMatrizVector(Matriz, V[:,n])
+        i=0
+        while i <= n:    
+            # print("i", i)
+            h[i][n] = multiplicacionDosVectores(V[:,i], t)
+            aux = multiplicacionValorVector(h[i][n], V[:,i])
+            t = [t[k] - aux[k] for k in range(min(len(t), len(aux)))]
+            i+=1
+        t_norm = np.linalg.norm(t, ord=2)
+        h[n+1][n] = t_norm
+        V[:,n+1] = t / t_norm
+        n +=1
 
-    # En efecto V cumple con lo que debe
-    # I = multiplicacionDosMatrices(V, trasp_v)
-    # print("I", I)
+    print(V)
 
-    # De V tenemos que quedarnos con los primeros n vectores y guardar en v_n+1 el ultimo:
-    V_n = Vtrasp[:, :-1]  # Seleccionar todas las columnas excepto la última V_n
-    v_n1 = Vtrasp[:, -1]  # Seleccionar la última columna v_n+1
-    # print("V_n", V_n)
-    # print("v_n1", v_n1)
+    n=0
+    while n<=(num_columnas):
+        j=0
+        while j<=n-1:
+            # print("j", j)
+            c_j = abs(h[j][j]) / (np.sqrt( h[j][j]*h[j][j] + h[j+1][j]*h[j+1][j]  ))
+            s_j = (h[j+1][j] / h[j][j])*c_j
+            h[j][n] = c_j*h[j][n] + s_j*h[j+1][n]
+            h[j+1][n] = -s_j*h[j][n] + c_j*h[j+1][n]
+            j += 1
+        c_n = abs(h[n][n]) / (np.sqrt( h[n][n]*h[n][n] + h[n+1][n]*h[n+1][n]  ))
+        s_n = (h[n+1][n] / h[n][n])*c_n
+        h[n][n] = c_n*h[n][n] + s_n*h[n+1][n]
+        h[n+1][n] = 0
+
+        g[n] = c_n*g[n]
+        g[n+1] = -s_n*g[n]
+
+        conver = abs(g[n+1])
+        print("conver", conver)
+        if conver <= tol and n>0:
+            h_reducida = h[:n, :n]
+            v_reducida = V[:, :n]
+            print(v_reducida)
+            g_reducido = g[:n]
+            inversa = np.linalg.inv(h_reducida)
+            VnH_1n = multiplicacionDosMatrices(v_reducida, inversa)
+            x = r_0 + multiplicacionMatrizVector(VnH_1n, g_reducido)
+            print("x", x)
+        n +=1
+    
+    return x
 
 
-    # Y de H tenemos que quitarle la última fila y la última columna Y QUEDARNOS ADEMÁS CON EL VALOR SUELTO 
-    H_n = H[:-1, :-1]  # Seleccionar todas las filas y columnas excepto la última
-    h_n1 = H[num_cols-1][num_cols-2]
-    # print("H_n", H_n)
-    # print("h_n1", h_n1)
 
-    MVn = multiplicacionDosMatrices(M, V_n)
-    print("MVn", np.array(MVn))
 
-    VNhN = multiplicacionDosMatrices(V_n, H_n)
-    # print("VNhN", np.array(VNhN))
 
-    auxiliar = np.zeros((N, num_cols-1))  # Crear una matriz de ceros de tamaño N x num_cols
-    auxiliar[:, -1] = v_n1  # Asignar el vector v_n+1 a la última columna de la matriz
-    auxiliar = multiplicacionValorMatriz(h_n1, auxiliar)
-    # print("auxiliar", np.array(auxiliar))
 
-    matriz_final =VNhN + auxiliar
-    print("final", np.array(matriz_final))
+
+def GMRES2(A, alpha, max_it, tol):
+
+
+    M = modificarMatriz(A, alpha)
+    N = len(A)
+
+    # Ax=b
+    
+    # Nuestro sistema es de la forma (I-alphaA)x = (1-alpha)v
+
+    # Necesitamos un vector inicial x_0
+    x_0 = np.random.rand(N)
+
+    # Nuestro vector b, que en nuestro caso es (1-alpha)v
+    v = np.ones(N) / N
+    b = multiplicacionValorVector(1-alpha, v)
+    print("b", b)
+    
+    # Nuestra matriz, que es (I-alpha(A))
+    Matriz = np.eye(N) - np.array(multiplicacionValorMatriz(alpha, A))
+    print("matriz", Matriz)
+
+    # Y nuestro vector r_0, b-Ax_0
+    Matx0 = multiplicacionMatrizVector(Matriz, x_0)
+    print("Matx0", Matx0)
+
+    r_0 = np.array(b) - np.array(Matx0)
+    print("r_0", r_0)
+
+    #Establecemos el máximo de iteraciones
+    num_columnas = max_it
+
+    # Generamos una matriz V y una h con todos sus valores a 0
+    V = np.zeros((N, num_columnas+1))
+    h = np.zeros((num_columnas+1, num_columnas))
+
+    # Establecemos el v_1 al vector inicial normalizado.
+    r_0_norm = np.linalg.norm(r_0, ord=2)
+    V[:, 0] = np.array(r_0 / r_0_norm)
+
+    # Inicializamos el vector g
+    g = np.zeros(num_columnas+1)
+    g[0] = r_0_norm
+ 
+    # Guardamos la norma para no repetir la operación en cada bucle
+    b_norm = np.linalg.norm(b, ord=2)
+
+    # Vector solucion
+    x = np.zeros(N)
+
+    N = N-1
+    num_columnas = num_columnas - 1
+
+    n=0
+    while n<=(num_columnas):
+        print("n", n)
+        t = multiplicacionMatrizVector(Matriz, V[:,n])
+        i=0
+        while i <= n:    
+            # print("i", i)
+            h[i][n] = multiplicacionDosVectores(V[:,i], t)
+            aux = multiplicacionValorVector(h[i][n], V[:,i])
+            t = [t[k] - aux[k] for k in range(min(len(t), len(aux)))]
+            i+=1
+        t_norm = np.linalg.norm(t, ord=2)
+        h[n+1][n] = t_norm
+        V[:,n+1] = t / t_norm
+
+        j=0
+        while j<=n-1:
+            # print("j", j)
+            c_j = abs(h[j][j]) / (np.sqrt( h[j][j]*h[j][j] + h[j+1][j]*h[j+1][j]  ))
+            s_j = (h[j+1][j] / h[j][j])*c_j
+            h[j][n] = c_j*h[j][n] + s_j*h[j+1][n]
+            h[j+1][n] = -s_j*h[j][n] + c_j*h[j+1][n]
+            j += 1
+        c_n = abs(h[n][n]) / (np.sqrt( h[n][n]*h[n][n] + h[n+1][n]*h[n+1][n]  ))
+        s_n = (h[n+1][n] / h[n][n])*c_n
+        h[n][n] = c_n*h[n][n] + s_n*h[n+1][n]
+        h[n+1][n] = 0
+
+        g[n] = c_n*g[n]
+        g[n+1] = -s_n*g[n]
+
+        conver = abs(g[n+1])/b_norm
+        print("conver", conver)
+        if conver <= tol and n>0:
+            h_reducida = h[:n, :n]
+            v_reducida = V[:, :n]
+            print(v_reducida)
+            g_reducido = g[:n]
+            inversa = np.linalg.inv(h_reducida)
+            VnH_1n = multiplicacionDosMatrices(v_reducida, inversa)
+            x = r_0 + multiplicacionMatrizVector(VnH_1n, g_reducido)
+            print("x", x)
+        n +=1
+    
+    print(multiplicacionMatrizVector(modificarMatriz(A, 0.85), x))
+    return x
+
+
+
+def pagerank_gmres(A, beta=0.85, tol=1e-6):
+    n = A.shape[0]
+    M = (beta * A) + ((1 - beta) / n) * np.ones((n, n))
+    b = np.ones(n) / n
+    x, _ = gmres(M, b, rtol=tol)
+    return x / np.sum(x)
 
 
 
 if __name__ == "__main__":
-    comprobacionArnoldi()
-   
+
+    # print("Creando matriz")
+    # A = matrizPageRank(5)
+    # print("matriz creada")
+    A = np.array([[1/2, 1/3, 0, 0],
+                  [0, 1/3, 0, 1],
+                  [0, 1/3, 1/2, 0],
+                  [1/2, 0, 1/2, 0]])
+    alpha = 0.85
+    
+
+    x = GMRES(A, alpha, 5, 0.00000000001)
+    print("Vector solución", x)
 
 
-
-
-
+    # Calculamos el PageRank utilizando GMRES
+    pagerank = pagerank_gmres(A)
+    print("PageRank:", pagerank)

@@ -32,10 +32,10 @@ def multiplicacionDosMatrices(A, B):
     if len(A[0]) != len(B):
         print("No se puede multiplicar estas matrices.")
         return None
-    
+
     # Inicializamos el vector resultado 
-    resultado = [[0] * len(B[0]) for _ in range(len(A))]
-    
+    resultado = np.zeros((len(A), len(B[0])))
+
     # Multiplicamos las matrices
     for i in range(len(A)):
         for j in range(len(B[0])):
@@ -46,19 +46,18 @@ def multiplicacionDosMatrices(A, B):
 
 # Función para multiplicar una matriz y un vector.
 def multiplicacionMatrizVector(A, v):
-    #Guardamos la dim de la matriz
-    n = len(A)
+    N, n = len(A), len(A[0])
 
-    #Comprobamos que se puedan multiplicar
+    # Comprobamos que se puedan multiplicar
     if n != len(v):
         print("No se puede multiplicar esta matriz y este vector.")
         return None
     
     # Inicializamos el vector resultado 
-    resultado = [0] * n
+    resultado = np.zeros(N)
     
     # Multiplicamos la matriz por el vector
-    for i in range(n):
+    for i in range(N):
         for j in range(n):
             resultado[i] += A[i][j] * v[j]
     
@@ -77,7 +76,7 @@ def multiplicacionMatrizVectorConCeros(A, v, ceros):
         return None
     
     # Inicializamos el vector resultado 
-    resultado = [0] * n
+    resultado = np.zeros(n)
     
     # Multiplicamos la matriz por el vector si la fila del vector no está completa a 0
     for i in range(n):
@@ -114,7 +113,7 @@ def multiplicacionValorVector(k, v):
 
     n = len(v)
     # Inicializamos el vector resultado 
-    resultado = [0] * n
+    resultado = np.zeros(n)
     # Multiplicamos la matriz por el vector
     for i in range(n):
         resultado[i] = k * v[i]
