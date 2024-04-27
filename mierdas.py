@@ -115,3 +115,119 @@ def arnoldi(A, v, num_columnas):
     # print(n)
     # print(i)
     return V,h
+
+
+
+
+
+
+
+
+
+
+
+def GMRES(A, alpha, max_it, tol):
+
+
+    M = modificarMatriz(A, alpha)
+    N = len(A)
+
+    # Ax=b
+    
+    # Nuestro sistema es de la forma (I-alphaA)x = (1-alpha)v
+
+    # Necesitamos un vector inicial x_0
+    x_0 = np.random.rand(N)
+
+    # Nuestro vector b, que en nuestro caso es (1-alpha)v
+    v = np.ones(N) / N
+    b = multiplicacionValorVector(1-alpha, v)
+    print("b", b)
+    
+    # Nuestra matriz, que es (I-alpha(A))
+    Matriz = np.eye(N) - np.array(multiplicacionValorMatriz(alpha, A))
+    print("matriz", Matriz)
+
+    # Y nuestro vector r_0, b-Ax_0
+    Matx0 = multiplicacionMatrizVector(Matriz, x_0)
+    print("Matx0", Matx0)
+
+    r_0 = np.array(b) - np.array(Matx0)
+    print("r_0", r_0)
+
+    #Establecemos el máximo de iteraciones
+    num_columnas = max_it
+
+    # Generamos una matriz V y una h con todos sus valores a 0
+    V = np.zeros((N, num_columnas+1))
+    h = np.zeros((num_columnas+1, num_columnas))
+
+    # Establecemos el v_1 al vector inicial normalizado.
+    r_0_norm = np.linalg.norm(r_0, ord=2)
+    V[:, 0] = np.array(r_0 / r_0_norm)
+
+    # Inicializamos el vector g
+    g = np.zeros(num_columnas+1)
+    g[0] = r_0_norm
+ 
+    # Guardamos la norma para no repetir la operación en cada bucle
+    b_norm = np.linalg.norm(b, ord=2)
+
+    # Vector solucion
+    x = np.zeros(N)
+
+    N = N-1
+    num_columnas = num_columnas - 1
+
+
+    n=0
+    while n<=(num_columnas):
+        print("n", n)
+        t = multiplicacionMatrizVector(Matriz, V[:,n])
+        i=0
+        while i <= n:    
+            # print("i", i)
+            h[i][n] = multiplicacionDosVectores(V[:,i], t)
+            aux = multiplicacionValorVector(h[i][n], V[:,i])
+            t = [t[k] - aux[k] for k in range(min(len(t), len(aux)))]
+            i+=1
+        t_norm = np.linalg.norm(t, ord=2)
+        h[n+1][n] = t_norm
+        V[:,n+1] = t / t_norm
+        n +=1
+
+    print(V)
+
+    n=0
+    while n<=(num_columnas):
+        j=0
+        while j<=n-1:
+            # print("j", j)
+            c_j = abs(h[j][j]) / (np.sqrt( h[j][j]*h[j][j] + h[j+1][j]*h[j+1][j]  ))
+            s_j = (h[j+1][j] / h[j][j])*c_j
+            h[j][n] = c_j*h[j][n] + s_j*h[j+1][n]
+            h[j+1][n] = -s_j*h[j][n] + c_j*h[j+1][n]
+            j += 1
+            
+        c_n = abs(h[n][n]) / (np.sqrt( h[n][n]*h[n][n] + h[n+1][n]*h[n+1][n]  ))
+        s_n = (h[n+1][n] / h[n][n])*c_n
+        h[n][n] = c_n*h[n][n] + s_n*h[n+1][n]
+        h[n+1][n] = 0
+
+        g[n] = c_n*g[n]
+        g[n+1] = -s_n*g[n]
+
+        conver = abs(g[n+1])
+        print("conver", conver)
+        if conver <= tol and n>0:
+            h_reducida = h[:n, :n]
+            v_reducida = V[:, :n]
+            print(v_reducida)
+            g_reducido = g[:n]
+            inversa = np.linalg.inv(h_reducida)
+            VnH_1n = multiplicacionDosMatrices(v_reducida, inversa)
+            x = r_0 + multiplicacionMatrizVector(VnH_1n, g_reducido)
+            print("x", x)
+        n +=1
+    
+    return x

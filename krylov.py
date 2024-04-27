@@ -142,6 +142,7 @@ def GMRES(A, alpha, max_it, tol):
             h[j][n] = c_j*h[j][n] + s_j*h[j+1][n]
             h[j+1][n] = -s_j*h[j][n] + c_j*h[j+1][n]
             j += 1
+            
         c_n = abs(h[n][n]) / (np.sqrt( h[n][n]*h[n][n] + h[n+1][n]*h[n+1][n]  ))
         s_n = (h[n+1][n] / h[n][n])*c_n
         h[n][n] = c_n*h[n][n] + s_n*h[n+1][n]
@@ -202,68 +203,99 @@ def GMRES2(A, alpha, max_it, tol):
 
     #Establecemos el máximo de iteraciones
     num_columnas = max_it
+    print("num_columnas", num_columnas)
 
     # Generamos una matriz V y una h con todos sus valores a 0
     V = np.zeros((N, num_columnas+1))
+    print("V", V)
     h = np.zeros((num_columnas+1, num_columnas))
+    print("h", h)
 
     # Establecemos el v_1 al vector inicial normalizado.
     r_0_norm = np.linalg.norm(r_0, ord=2)
+    print("r_0_norm", r_0_norm)
     V[:, 0] = np.array(r_0 / r_0_norm)
+    print("V[:, 0]", V[:, 0])
 
     # Inicializamos el vector g
     g = np.zeros(num_columnas+1)
     g[0] = r_0_norm
- 
+    print("g", g)
+
     # Guardamos la norma para no repetir la operación en cada bucle
     b_norm = np.linalg.norm(b, ord=2)
+    print("b_norm", b_norm)
 
     # Vector solucion
     x = np.zeros(N)
+    print("x", x)
 
     N = N-1
     num_columnas = num_columnas - 1
+    print("N", N)
+    print("num_columnas", num_columnas)
 
     n=0
     while n<=(num_columnas):
         print("n", n)
         t = multiplicacionMatrizVector(Matriz, V[:,n])
+        print("t", t)
         i=0
         while i <= n:    
-            # print("i", i)
+            print("i", i)
             h[i][n] = multiplicacionDosVectores(V[:,i], t)
+            print("h[i][n]", h[i][n])
             aux = multiplicacionValorVector(h[i][n], V[:,i])
+            print("aux", aux)
             t = [t[k] - aux[k] for k in range(min(len(t), len(aux)))]
+            print("t", t)
             i+=1
         t_norm = np.linalg.norm(t, ord=2)
+        print("t_norm", t_norm)
         h[n+1][n] = t_norm
+        print("h[n+1][n]", h[n+1][n])
         V[:,n+1] = t / t_norm
+        print("V[:,n+1]", V[:,n+1])
 
         j=0
         while j<=n-1:
-            # print("j", j)
+            print("j", j)
             c_j = abs(h[j][j]) / (np.sqrt( h[j][j]*h[j][j] + h[j+1][j]*h[j+1][j]  ))
+            print("c_j", c_j)
             s_j = (h[j+1][j] / h[j][j])*c_j
+            print("s_j", s_j)
             h[j][n] = c_j*h[j][n] + s_j*h[j+1][n]
+            print("h[j][n]", h[j][n])
             h[j+1][n] = -s_j*h[j][n] + c_j*h[j+1][n]
+            print("h[j+1][n]", h[j+1][n])
             j += 1
         c_n = abs(h[n][n]) / (np.sqrt( h[n][n]*h[n][n] + h[n+1][n]*h[n+1][n]  ))
+        print("c_n", c_n)
         s_n = (h[n+1][n] / h[n][n])*c_n
+        print("s_n", s_n)
         h[n][n] = c_n*h[n][n] + s_n*h[n+1][n]
+        print("h[n][n]", h[n][n])
         h[n+1][n] = 0
+        print("h[n+1][n]", h[n+1][n])
 
         g[n] = c_n*g[n]
+        print("g[n]", g[n])
         g[n+1] = -s_n*g[n]
+        print("g[n+1]", g[n+1])
 
         conver = abs(g[n+1])/b_norm
         print("conver", conver)
         if conver <= tol and n>0:
             h_reducida = h[:n, :n]
+            print("h_reducida", h_reducida)
             v_reducida = V[:, :n]
-            print(v_reducida)
+            print("v_reducida", v_reducida)
             g_reducido = g[:n]
+            print("g_reducido", g_reducido)
             inversa = np.linalg.inv(h_reducida)
+            print("inversa", inversa)
             VnH_1n = multiplicacionDosMatrices(v_reducida, inversa)
+            print("VnH_1n", VnH_1n)
             x = r_0 + multiplicacionMatrizVector(VnH_1n, g_reducido)
             print("x", x)
         n +=1
