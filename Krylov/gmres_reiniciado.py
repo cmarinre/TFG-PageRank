@@ -4,7 +4,7 @@ import time
 from funciones_comunes import matrizPageRank, sumaDosMatrices, multiplicacionDosVectores, multiplicacionMatrizVector, multiplicacionValorVector, multiplicacionDosMatrices, modificarMatriz, multiplicacionValorMatriz
 from scipy.sparse.linalg import gmres
 
-def GMRES(A, b, x_0, max_it, tol):
+def GMRES(A, b, x_0, max_it):
 
     N = len(A)
     
@@ -27,8 +27,6 @@ def GMRES(A, b, x_0, max_it, tol):
     g = np.zeros(num_columnas+1)
     g[0] = r_0_norm
     
-    # Guardamos la norma para no repetir la operación en cada bucle
-    b_norm = np.linalg.norm(b, ord=2)
     
     # Vector solucion
     x = np.zeros(N)
@@ -72,9 +70,8 @@ def GMRES(A, b, x_0, max_it, tol):
         g[n+1] = -s_n*g[n]
         g[n] = c_n*g[n]
         
-        # Comprobamos la convergencia
-        conver = abs(g[n+1])/b_norm
-        if conver <= tol and n>0:
+        if n==num_columnas:
+            b_norm = np.linalg.norm(b, ord=2)
             h_reducida = h[:(n+1), :(n+1)]
             v_reducida = V[:, :(n+1)]
             g_reducido = g[:(n+1)]
@@ -82,20 +79,35 @@ def GMRES(A, b, x_0, max_it, tol):
             VnH_1n = multiplicacionDosMatrices(v_reducida, inversa)
             VnH_1ng = multiplicacionMatrizVector(VnH_1n, g_reducido)
             x = x_0 + VnH_1ng
-            n=num_columnas
+            conver = abs(g[n+1])/b_norm
         n +=1
     
-    return x
+    return x, conver
 
 
+# La idea de este método es ejecutar n veces el método y poner como
+# Vector inicial el vector generado por el anterior GMRES.
+def GMRESReiniciado(Matriz, b, tol):
+        
+    # Necesitamos un vector inicial x_0
+    x_0 = np.random.rand(N)
+    x_0 = x_0 / np.linalg.norm(np.array(x_0), ord=1)
+    conver = 1
+
+    while conver>tol:
+        # Aplicación del método GMRES
+        x_n, conver = GMRES(Matriz, b, x_0, 3)
+        x_0 = x_n
+        print("x_n", x_n)
+
+    return x_n
 
 
 if __name__ == "__main__":
 
     print("Creando matriz")
-    A = matrizPageRank(3000)
+    A = matrizPageRank(30)
     print("matriz creada")
-
 
     alpha = 0.85
     N = len(A)
@@ -110,22 +122,22 @@ if __name__ == "__main__":
     # Nuestra matriz, que es (I-alpha(A))
     Matriz = np.eye(N) - np.array(multiplicacionValorMatriz(alpha, A))
     
-    # Necesitamos un vector inicial x_0
-    x_0 = np.random.rand(N)
-
     # Registro del tiempo de inicio
-    start_time2 = time.time()
-    # Aplicación del método de las potencias adaptado
-    x_n = GMRES(Matriz, b, x_0, 10000, 0.000000000001)
-    # Registro del tiempo de finalización
-    end_time2 = time.time()
-    # Cálculo del tiempo transcurrido
-    elapsed_time2 = end_time2 - start_time2
+    start_time = time.time()
 
-    print("El tiempo de ejecución de adaptive fue de: {:.5f} segundos".format(elapsed_time2))
+    x_n = GMRESReiniciado(Matriz, b, 0.000000000001)
+
+    # Registro del tiempo de finalización
+    end_time = time.time()
+    # Cálculo del tiempo transcurrido
+    elapsed_time = end_time - start_time
+
+
+    print("El tiempo de ejecución de GMRES fue de: {:.5f} segundos".format(elapsed_time))
     
     x_n_norm = x_n / np.linalg.norm(np.array(x_n), ord=1)
     print("Vector solución normalizado", x_n_norm)
+
 
 
     # Para comprobar que funciona, comparamos con un programa ya hecho por pyhton
