@@ -37,8 +37,9 @@ def GMRES(A, b, x_0, max_it, tol):
     N = N-1
     num_columnas = num_columnas - 1
     
+    no_convergido = True
     n=0
-    while n<=(num_columnas):
+    while n<=(num_columnas) and no_convergido:
 
         t = multiplicacionMatrizVector(A, V[:,n])
         
@@ -87,10 +88,10 @@ def GMRES(A, b, x_0, max_it, tol):
             VnH_1ng = multiplicacionMatrizVector(VnH_1n, g_reducido)
             x = x_0 + VnH_1ng
             # Para salir del bucle establecemos n al máximo.
-            n=num_columnas
+            no_convergido = False
         n +=1
     
-    return x
+    return x,n
 
 
 
@@ -121,7 +122,7 @@ if __name__ == "__main__":
     # Registro del tiempo de inicio
     start_time = time.time()
     # Aplicación del método GMRES
-    x_n = GMRES(Matriz, b, x_0, 10000, 0.000000000001)
+    x_n, it = GMRES(Matriz, b, x_0, 100, 0.000000000001)
     # Registro del tiempo de finalización
     end_time = time.time()
     # Cálculo del tiempo transcurrido

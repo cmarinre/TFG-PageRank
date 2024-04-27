@@ -87,19 +87,17 @@ def GMRES(A, b, x_0, max_it):
 
 # La idea de este método es ejecutar n veces el método y poner como
 # Vector inicial el vector generado por el anterior GMRES.
-def GMRESReiniciado(Matriz, b, x_0, tol):
+def GMRESReiniciado(Matriz, b, x_0, tol, m):
         
     conver = 1
-
+    it=0
     while conver>tol:
         # Aplicación del método GMRES
-        x_n, conver = GMRES(Matriz, b, x_0, 3)
+        x_n, conver = GMRES(Matriz, b, x_0, m)
         x_0 = x_n
+        it+=1
 
-    return x_n
-
-
-
+    return x_n, m*it
 
 
 
@@ -129,7 +127,7 @@ if __name__ == "__main__":
     x_0 = x_0 / np.linalg.norm(np.array(x_0), ord=1)
 
     start_time = time.time()
-    x_n = GMRESReiniciado(Matriz, b, x_0, 0.000000000001)
+    x_n, n = GMRESReiniciado(Matriz, b, x_0, 0.000000000001, 100)
     end_time = time.time()
     elapsed_time = end_time - start_time
 
