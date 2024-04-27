@@ -57,7 +57,7 @@ def comparacionPowersMult(A):
     print("El tiempo de ejecución de power fue de: {:.5f} segundos".format(elapsed_time1))
     print("Número de iteraciones:", num_it1)
     print("Suma de los valores del vector propio para asegurar que su norma 1 es igual a 1:", np.sum(eigenvector1))
-    print("Vector propio:", eigenvector1[1])
+    print("Vector propio:", eigenvector1)
 
     # Registro del tiempo de inicio
     start_time2 = time.time()
@@ -71,7 +71,7 @@ def comparacionPowersMult(A):
     print("El tiempo de ejecución de adaptive fue de: {:.5f} segundos".format(elapsed_time2))
     print("Número de iteraciones:", num_it2)
     print("Suma de los valores del vector propio para asegurar que su norma 1 es igual a 1:", np.sum(eigenvector2))
-    print("Vector propio:", eigenvector2[1])
+    print("Vector propio:", eigenvector2)
 
 
 
@@ -80,6 +80,10 @@ if __name__ == "__main__":
     #               [0, 1/3, 0, 1],
     #               [0, 1/3, 1/2, 0],
     #               [1/2, 0, 1/2, 0]])
+
+    # A = np.array([[0, 1/2, 1/3],
+    #         [1/2, 0, 1/3],
+    #         [1/2, 1/2, 1/3]])
 
     print("Creando matriz")
     A = matrizPageRank(3000)
