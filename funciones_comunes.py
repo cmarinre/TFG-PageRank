@@ -139,10 +139,17 @@ def sumaDosMatrices(A, B):
             A[i][j] = A[i][j] + B[i][j]
     return A
 
-    
+
+# Función que dada una matriz A y un escalas alpha devuelve la matriz modificada para ser estocástica por columnas y con dim(V_1(A))=1
 def modificarMatriz(A, alpha):
 
     n = len(A)
     S = [[1/n] * (n) for _ in range(n)]
     M = multiplicacionValorMatriz(alpha, A) + multiplicacionValorMatriz((1-alpha), S)
     return M
+
+
+
+if __name__ == "__main__":
+
+    print(".")

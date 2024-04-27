@@ -1,7 +1,7 @@
 
 import numpy as np
 import time
-from funciones_comunes import matrizPageRank, sumaDosMatrices, multiplicacionDosVectores, multiplicacionMatrizVector, multiplicacionValorVector, multiplicacionDosMatrices, modificarMatriz, multiplicacionValorMatriz
+from funciones_comunes import matrizPageRank, multiplicacionDosVectores, multiplicacionMatrizVector, multiplicacionValorVector, multiplicacionDosMatrices, multiplicacionValorMatriz
 from scipy.sparse.linalg import gmres
 
 def GMRES(A, b, x_0, max_it):
@@ -9,8 +9,8 @@ def GMRES(A, b, x_0, max_it):
     N = len(A)
     
     # Y nuestro vector r_0, b-Ax_0
-    Matx0 = multiplicacionMatrizVector(Matriz, x_0)
-    r_0 = np.array(b) - np.array(Matx0)
+    Ax0 = multiplicacionMatrizVector(A, x_0)
+    r_0 = np.array(b) - np.array(Ax0)
     
     #Establecemos el máximo de iteraciones
     num_columnas = max_it
@@ -38,7 +38,7 @@ def GMRES(A, b, x_0, max_it):
     n=0
     while n<=(num_columnas):
 
-        t = multiplicacionMatrizVector(Matriz, V[:,n])
+        t = multiplicacionMatrizVector(A, V[:,n])
         
         # Arnoldi
         i=0
@@ -87,20 +87,22 @@ def GMRES(A, b, x_0, max_it):
 
 # La idea de este método es ejecutar n veces el método y poner como
 # Vector inicial el vector generado por el anterior GMRES.
-def GMRESReiniciado(Matriz, b, tol):
+def GMRESReiniciado(Matriz, b, x_0, tol):
         
-    # Necesitamos un vector inicial x_0
-    x_0 = np.random.rand(N)
-    x_0 = x_0 / np.linalg.norm(np.array(x_0), ord=1)
     conver = 1
 
     while conver>tol:
         # Aplicación del método GMRES
         x_n, conver = GMRES(Matriz, b, x_0, 3)
         x_0 = x_n
-        print("x_n", x_n)
 
     return x_n
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
@@ -121,15 +123,14 @@ if __name__ == "__main__":
     
     # Nuestra matriz, que es (I-alpha(A))
     Matriz = np.eye(N) - np.array(multiplicacionValorMatriz(alpha, A))
-    
-    # Registro del tiempo de inicio
+
+    # Necesitamos un vector inicial x_0
+    x_0 = np.random.rand(N)
+    x_0 = x_0 / np.linalg.norm(np.array(x_0), ord=1)
+
     start_time = time.time()
-
-    x_n = GMRESReiniciado(Matriz, b, 0.000000000001)
-
-    # Registro del tiempo de finalización
+    x_n = GMRESReiniciado(Matriz, b, x_0, 0.000000000001)
     end_time = time.time()
-    # Cálculo del tiempo transcurrido
     elapsed_time = end_time - start_time
 
 

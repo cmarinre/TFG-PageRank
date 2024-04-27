@@ -1,16 +1,16 @@
 
 import numpy as np
 import time
-from funciones_comunes import matrizPageRank, sumaDosMatrices, multiplicacionDosVectores, multiplicacionMatrizVector, multiplicacionValorVector, multiplicacionDosMatrices, modificarMatriz, multiplicacionValorMatriz
+from funciones_comunes import matrizPageRank, multiplicacionDosVectores, multiplicacionMatrizVector, multiplicacionValorVector, multiplicacionDosMatrices, multiplicacionValorMatriz
 from scipy.sparse.linalg import gmres
 
 def GMRES(A, b, x_0, max_it, tol):
 
     N = len(A)
     
-    # Y nuestro vector r_0, b-Ax_0
-    Matx0 = multiplicacionMatrizVector(Matriz, x_0)
-    r_0 = np.array(b) - np.array(Matx0)
+    # Creamos el vec r_0, que es b-Ax_0
+    Ax0 = multiplicacionMatrizVector(A, x_0)
+    r_0 = np.array(b) - np.array(Ax0)
     
     #Establecemos el máximo de iteraciones
     num_columnas = max_it
@@ -40,7 +40,7 @@ def GMRES(A, b, x_0, max_it, tol):
     n=0
     while n<=(num_columnas):
 
-        t = multiplicacionMatrizVector(Matriz, V[:,n])
+        t = multiplicacionMatrizVector(A, V[:,n])
         
         # Arnoldi
         i=0
@@ -75,13 +75,18 @@ def GMRES(A, b, x_0, max_it, tol):
         # Comprobamos la convergencia
         conver = abs(g[n+1])/b_norm
         if conver <= tol and n>0:
+            # La matrices con las que hemos estado tratando eran V_{n+1} y H_{n+1}.
+            # Para este caso necesitamos V_n y H_n luego las reducimos.
             h_reducida = h[:(n+1), :(n+1)]
             v_reducida = V[:, :(n+1)]
+            # Lo mismo con el vector g
             g_reducido = g[:(n+1)]
+            # Calculamos x = x_0 + V_{n} H^{-1}_{n} g 
             inversa = np.linalg.inv(h_reducida)
             VnH_1n = multiplicacionDosMatrices(v_reducida, inversa)
             VnH_1ng = multiplicacionMatrizVector(VnH_1n, g_reducido)
             x = x_0 + VnH_1ng
+            # Para salir del bucle establecemos n al máximo.
             n=num_columnas
         n +=1
     
@@ -95,7 +100,6 @@ if __name__ == "__main__":
     print("Creando matriz")
     A = matrizPageRank(3)
     print("matriz creada")
-
 
     alpha = 0.85
     N = len(A)
@@ -126,7 +130,6 @@ if __name__ == "__main__":
 
     print("El tiempo de ejecución de GMRES fue de: {:.5f} segundos".format(elapsed_time))
     print("Vector solución", x_n)
-
 
 
     # Para comprobar que funciona, comparamos con un programa ya hecho por pyhton

@@ -68,6 +68,5 @@ def power_method_convergence(matrix, max_iterations=50000, tolerance=0.000000000
     return vector, i
 
 
-# Ejemplo de uso 
 if __name__ == "__main__":
     print("Aquí no hay código. Vaya a comparacion_powers.py, por favor.")
