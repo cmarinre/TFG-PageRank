@@ -4,7 +4,7 @@ import time
 from funciones_comunes import matrizPageRank, multiplicacionDosVectores, multiplicacionMatrizVector, multiplicacionValorVector, multiplicacionDosMatrices, multiplicacionValorMatriz
 from scipy.sparse.linalg import gmres
 
-def GMRES(A, b, x_0, max_it):
+def GMRES_m(A, b, x_0, max_it):
 
     N = len(A)
     
@@ -87,16 +87,17 @@ def GMRES(A, b, x_0, max_it):
 
 # La idea de este método es ejecutar n veces el método y poner como
 # Vector inicial el vector generado por el anterior GMRES.
-def GMRESReiniciado(Matriz, b, x_0, tol, m):
+def GMRESReiniciado(Matriz, b, x_0, tol, m, max_it):
         
     conver = 1
     it=0
-    while conver>tol:
+    while conver>tol and it<max_it:
         # Aplicación del método GMRES
-        x_n, conver = GMRES(Matriz, b, x_0, m)
+        x_n, conver = GMRES_m(Matriz, b, x_0, m)
         x_0 = x_n
         it+=1
 
+    x_n = x_n / np.linalg.norm(x_n, ord=1)
     return x_n, m*it
 
 

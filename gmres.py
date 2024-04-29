@@ -75,6 +75,9 @@ def GMRES(A, b, x_0, max_it, tol):
         
         # Comprobamos la convergencia
         conver = abs(g[n+1])/b_norm
+        # print(conver)
+        # print(b_norm)
+        # print(g[n+1])
         if conver <= tol and n>0:
             # La matrices con las que hemos estado tratando eran V_{n+1} y H_{n+1}.
             # Para este caso necesitamos V_n y H_n luego las reducimos.
@@ -90,7 +93,9 @@ def GMRES(A, b, x_0, max_it, tol):
             # Para salir del bucle establecemos n al máximo.
             no_convergido = False
         n +=1
+        # print(np.array(x))
     
+    x = x / np.linalg.norm(x, ord=1)
     return x,n
 
 

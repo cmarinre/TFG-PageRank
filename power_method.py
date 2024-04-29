@@ -3,17 +3,7 @@ from funciones_comunes import multiplicacionMatrizVector
 
 # Método de las potencias estándar, calculando la convergencia con la norma 1
 # y multiplicando la matriz con nuestra función definida arriba
-def power_method(matrix, max_iterations=50000, tolerance=0.000000000001):
-
-    # Obtenemos la dimensión de la matriz
-    n = len(matrix)
-
-    # Generamos un vector aleatorio de tamaño n
-    vector = np.random.rand(n)
-
-    # Lo normalizamos dividiendo por la norma 1 (suma de las componentes)
-    vector /= np.linalg.norm(vector, ord=1)
-
+def power_method(matrix, vector, max_iterations, tolerance):
 
     # Ejecutamos el método de las potencias y paramos cuando el número de iteraciones sea el máximo
     # O cuando cumple el factor de tolerancia
@@ -37,23 +27,19 @@ def power_method(matrix, max_iterations=50000, tolerance=0.000000000001):
 
 # Método de las potencias estándar, calculando la convergencia como la convergencia de las componentes una a una
 # y multiplicando la matriz con nuestra función definida arriba
-def power_method_convergence(matrix, max_iterations=50000, tolerance=0.000000000001):
-
-    # Obtenemos la dimensión de la matriz
-    n = len(matrix)
-
-    # Generamos un vector aleatorio de tamaño n
-    vector = np.random.rand(n)
-
-    # Lo normalizamos dividiendo por la norma 1 (suma de las componentes)
-    vector /= np.linalg.norm(vector, ord=1)
+def power_method_convergence(matrix, vector, max_iterations, tolerance):
 
     # Ejecutamos el método de las potencias y paramos cuando el número de iteraciones sea el máximo
     # O cuando cumple el factor de tolerancia
     for i in range(max_iterations):
         # Multiplicación de la matriz por el vector
         matrix_vector_product = multiplicacionMatrizVector(matrix, vector)
-        
+
+        #Por si la norma es 0
+        if(np.linalg.norm(matrix_vector_product, ord=1)==0): 
+            print("No se puede dividir por 0")
+            break
+
         # Cálculo del nuevo vector
         new_vector = matrix_vector_product / np.linalg.norm(matrix_vector_product, ord=1)
 

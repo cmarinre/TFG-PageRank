@@ -1,21 +1,15 @@
-import numpy as np
 from funciones_comunes import multiplicacionMatrizVectorConCeros
+import copy
 
 
 #Método de las potencias adaptado, multiplcando la matriz con nuestra función especial
-def adaptive_power_method(matrix, max_iterations=50000, tolerance=0.000000000001):
+def adaptive_power_method(matrix, vector, max_iterations, tolerance):
 
     # Obtenemos la dimensión de la matriz
     n = len(matrix)
 
     # Vector de convergencia de componentes
     converg_comp = [0] * n
-
-    # Generamos un vector aleatorio de tamaño n
-    vector = np.random.rand(n)
-
-    # Lo normalizamos dividiendo por la norma 1 (suma de las componentes)
-    vector /= np.linalg.norm(vector, ord=1)
 
     # Inicializamos los dos vectores y la matriz
     x_k = vector
