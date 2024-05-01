@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 
 from funciones_comunes import multiplicacionMatrizVector
@@ -11,7 +13,8 @@ def paraller_power(A, vector, max_iterations, tolerance, alphas):
     N = len(A)
     x_k = np.zeros((s, N))
     x_k_1 = np.zeros((s, N))
-    while k < max_iterations:
+    salir = False
+    while k < max_iterations and salir==False:
         if k==0:
             u1 = multiplicacionMatrizVector(A, vector)
             u2 = vector
@@ -31,22 +34,14 @@ def paraller_power(A, vector, max_iterations, tolerance, alphas):
             x_k[i] = x_k[i] / np.linalg.norm(x_k[i], ord=1)
 
         for i in range(s):
-            print(i)
-            all_converg = 0
-            # print(x_k[i])
-            # print(x_k[i][0])
-            # print(x_k_1[i])
             resta = [abs(x_k[i][j] - x_k_1[i][j]) for j in range(N)]
             if all(abs(valor) < tolerance for valor in resta):
-                all_converg+=1
+                salir = True
 
-        if(all_converg==s):
-            break
-
-        x_k_1 = x_k
+        x_k_1 = copy.deepcopy(x_k)
         k+=1
 
-    return x_k
+    return x_k, k
 
 if __name__ == "__main__":
     A = np.array([[1/2, 1/3, 0, 0],
@@ -55,5 +50,7 @@ if __name__ == "__main__":
                 [1/2, 0, 1/2, 0]])
     N = len(A)
     v = np.ones(N) 
-    x_k = paraller_power(A, v, 10, 0.000000001, [0.25, 0.33, 0.5, 0.66, 0.75,1])
+    # x_k = paraller_power(A, v, 10, 0.00000001, [0.25])
+    x_k, num_it = paraller_power(A, v, 10000, 0.000000001, [0.25, 0.33, 0.5, 0.66, 0.75, 0.85])
     print(x_k)
+    print(num_it)
