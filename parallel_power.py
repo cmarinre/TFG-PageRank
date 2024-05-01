@@ -43,6 +43,44 @@ def paraller_power(A, vector, max_iterations, tolerance, alphas):
 
     return x_k, k
 
+
+def paraller_power_modified(A, vector, max_mv, tolerance, alphas):
+    s = len(alphas)
+    N = len(A)
+
+    x = np.zeros((s, N))
+    r = np.ones((s, N))
+    res = np.ones(s)
+
+    u = multiplicacionMatrizVector(A, v) - v
+    
+    for i in range(s):
+        r[i] = alphas[i]*u
+        res[i] = np.linalg.norm(r[i], ord=2)
+        if res[i]>= tolerance:
+            x[i] = r[i] + v
+
+    mv=1
+
+    while max(res) >= tolerance and mv <= max_mv:
+        u = multiplicacionMatrizVector(A,v)
+        mv += 1
+        
+        for i in range(s):
+            if res[i]>=tolerance:
+                r[i] = alphas[i]*u
+                res[i] = np.linalg.norm(r[i], ord=2)
+
+            if res[i]>= tolerance:
+                x[i] = r[i] + x[i]
+
+        for i in range(s):
+            x[i] = x[i] / np.linalg.norm(x[i], ord=1)
+
+    return x, mv
+
+
+
 if __name__ == "__main__":
     A = np.array([[1/2, 1/3, 0, 0],
                 [0, 1/3, 0, 1],
@@ -50,7 +88,12 @@ if __name__ == "__main__":
                 [1/2, 0, 1/2, 0]])
     N = len(A)
     v = np.ones(N) 
-    # x_k = paraller_power(A, v, 10, 0.00000001, [0.25])
     x_k, num_it = paraller_power(A, v, 10000, 0.000000001, [0.25, 0.33, 0.5, 0.66, 0.75, 0.85])
+
     print(x_k)
     print(num_it)
+
+    x, num_it2 = paraller_power_modified(A, v, 10000, 0.000001, [0.25, 0.33, 0.5, 0.66, 0.75, 0.85])
+
+    print(x)
+    print(num_it2)
