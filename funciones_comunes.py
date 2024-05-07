@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # Función para la generación de una matriz dado un tamaño, que se parezca a una matriz de enlaces.
 # Intentamos establecer el número de enlaces salientes de cada página y ponerlos aleatoriamente en páginas distintas.
 def matrizPageRank(n):
@@ -124,11 +125,12 @@ def multiplicacionValorVector(k, v):
 def multiplicacionValorMatriz(k, A):
     filas = len(A)
     columnas = len(A[0])
+    A_copy = np.zeros((filas, columnas))  # Creamos una copia de la matriz original
     for i in range(filas):
         for j in range(columnas):
-            A[i][j] = A[i][j]*k
+            A_copy[i][j] = A[i][j] * k  # Multiplicamos cada elemento por k en la copia
 
-    return A
+    return A_copy
 
 # Función para sumar dos matrices.
 def sumaDosMatrices(A, B):
@@ -148,7 +150,20 @@ def modificarMatriz(A, alpha):
     M = multiplicacionValorMatriz(alpha, A) + multiplicacionValorMatriz((1-alpha), S)
     return M
 
+def arreglarNodosColgantes(A):
+    n = len(A)
+    nueva_matriz = np.zeros((n+1, n+1))  # Crear una matriz de (n+1)x(n+1) llena de ceros
+    nueva_matriz[:n, :n] = A  # Copiar la matriz original en la esquina superior izquierda
 
+    # Colocar 1 en el n+1xn+1
+    nueva_matriz[n][n] = 1 
+    
+    # Poner 1s en todas las columnas adicionales a la columna nx
+    for i in range(n):
+        if np.all(A[:, i] == 0):  # Si todas las entradas de la columna son cero
+            nueva_matriz[n][i] = 1  # Poner 1 en la nueva columna para esta fila
+
+    return nueva_matriz
 
 if __name__ == "__main__":
 

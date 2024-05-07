@@ -1,8 +1,12 @@
+import copy
+
 import numpy as np
+
 from funciones_comunes import multiplicacionMatrizVector
 
+
 # Método de las potencias estándar, calculando la convergencia con la norma 1
-# y multiplicando la matriz con nuestra función definida arriba
+# y multiplicando la función del numpy
 def power_method(matrix, vector, max_iterations, tolerance):
 
     # Ejecutamos el método de las potencias y paramos cuando el número de iteraciones sea el máximo
@@ -10,7 +14,7 @@ def power_method(matrix, vector, max_iterations, tolerance):
     for i in range(max_iterations):
 
         # Multiplicación de la matriz por el vector
-        new_vector = multiplicacionMatrizVector(matrix, vector)
+        new_vector = np.dot(matrix, vector)
         
         # Aquí deberíamos dividir por la norma pero la norma siempre es 1.
         # new_vector = new_vector / np.linalg.norm(new_vector, ord=1)
@@ -26,7 +30,7 @@ def power_method(matrix, vector, max_iterations, tolerance):
     return vector, i
 
 # Método de las potencias estándar, calculando la convergencia como la convergencia de las componentes una a una
-# y multiplicando la matriz con nuestra función definida arriba
+# y multiplicando la matriz con nuestra función particular.
 def power_method_convergence(matrix, vector, max_iterations, tolerance):
 
     # Ejecutamos el método de las potencias y paramos cuando el número de iteraciones sea el máximo
@@ -43,13 +47,12 @@ def power_method_convergence(matrix, vector, max_iterations, tolerance):
         # Cálculo del nuevo vector
         new_vector = matrix_vector_product / np.linalg.norm(matrix_vector_product, ord=1)
 
-        # Comprobación de convergencia
-        resta = [abs(new_vector[i] - vector[i]) for i in range(min(len(new_vector), len(vector)))]
-        if all(abs(valor) < tolerance for valor in resta):
+       # Comprobación de convergencia
+        if np.allclose(new_vector, vector, atol=tolerance):
             break
 
         # Guardamos el vector nuevo
-        vector = new_vector
+        vector = copy.deepcopy(new_vector)
 
     return vector, i
 
