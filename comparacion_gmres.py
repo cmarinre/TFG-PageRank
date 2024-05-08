@@ -67,16 +67,16 @@ def comparacion_gmres(A, x_0, alpha, max_it, tol, m1, m2, m3):
     print("Número de iteraciones:", iteraciones_rei)
 
 
-    print("comienza GMRES 8")
+    # print("comienza GMRES 8")
 
-    start_time_rei = time.time()
-    x_n_rei3, iteraciones_rei = GMRESReiniciado(copy.deepcopy(Matriz), copy.deepcopy(b), copy.deepcopy(x_0), tol, m3, max_it)
-    end_time_rei = time.time()
-    elapsed_time_rei = end_time_rei - start_time_rei
+    # start_time_rei = time.time()
+    # x_n_rei3, iteraciones_rei = GMRESReiniciado(copy.deepcopy(Matriz), copy.deepcopy(b), copy.deepcopy(x_0), tol, m3, max_it)
+    # end_time_rei = time.time()
+    # elapsed_time_rei = end_time_rei - start_time_rei
 
-    print("El tiempo de ejecución de GMRES reiniciado fue de: {:.5f} segundos".format(elapsed_time_rei))
-    # print("Vector solución", x_n_rei)
-    print("Número de iteraciones:", iteraciones_rei)
+    # print("El tiempo de ejecución de GMRES reiniciado fue de: {:.5f} segundos".format(elapsed_time_rei))
+    # # print("Vector solución", x_n_rei)
+    # print("Número de iteraciones:", iteraciones_rei)
 
     return x_n, x_n_rei, x_n_rei2, x_n_rei3
 
@@ -99,21 +99,21 @@ if __name__ == "__main__":
 
     x_n, x_n_rei, x_n_rei2, x_n_rei3 = comparacion_gmres(A, x_0, 0.85, 500, 0.00000001, 2, 5, 8)
     
-    eigenvector1, num_it1 = ejecucionPowerEstandar(A, x_0, 500, 0.00000001)
+    # eigenvector1, num_it1 = ejecucionPowerEstandar(A, x_0, 500, 0.0001)
 
-    resta = np.array(x_n) - np.array(eigenvector1)
-    norma = np.linalg.norm(resta)
+    # resta = np.array(x_n) - np.array(eigenvector1)
+    # norma = np.linalg.norm(resta)
 
-    resta2 = np.array(x_n_rei) - np.array(eigenvector1)
-    norma2 = np.linalg.norm(resta2)
+    # resta2 = np.array(x_n_rei) - np.array(eigenvector1)
+    # norma2 = np.linalg.norm(resta2)
 
-    resta3 = np.array(x_n_rei2) - np.array(eigenvector1)
-    norma3 = np.linalg.norm(resta3)
+    # resta3 = np.array(x_n_rei2) - np.array(eigenvector1)
+    # norma3 = np.linalg.norm(resta3)
 
-    resta4 = np.array(x_n_rei3) - np.array(eigenvector1)
-    norma4 = np.linalg.norm(resta4)
+    # resta4 = np.array(x_n_rei3) - np.array(eigenvector1)
+    # norma4 = np.linalg.norm(resta4)
 
-    print(norma)
-    print(norma2)
-    print(norma3)
-    print(norma4)
+    # print(norma)
+    # print(norma2)
+    # print(norma3)
+    # print(norma4)

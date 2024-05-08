@@ -2,9 +2,6 @@
 import time
 
 import numpy as np
-from scipy.sparse.linalg import gmres
-
-from funciones_comunes import matrizPageRank, multiplicacionMatrizVector
 
 
 def GMRES(A, b, x_0, max_it, tol):
@@ -12,7 +9,7 @@ def GMRES(A, b, x_0, max_it, tol):
     N = len(A)
     
     # Creamos el vec r_0, que es b-Ax_0
-    Ax0 = multiplicacionMatrizVector(A, x_0)
+    Ax0 = np.dot(A, x_0)
     r_0 = np.array(b) - np.array(Ax0)
     
     # Establecemos el número de columnas inicial a 2

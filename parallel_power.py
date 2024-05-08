@@ -2,8 +2,6 @@ import copy
 
 import numpy as np
 
-from funciones_comunes import multiplicacionMatrizVector
-
 
 def paraller_power(A, vector, max_iterations, tolerance, alphas):
     k=0
@@ -16,7 +14,7 @@ def paraller_power(A, vector, max_iterations, tolerance, alphas):
     salir = False
     while k < max_iterations and salir==False:
         if k==0:
-            u1 = multiplicacionMatrizVector(A, vector)
+            u1 = np.dot(A, vector)
             u2 = vector
             for i in range(s):
                 x_k[i] = np.dot(alphas[i], u1) + np.dot((1-alphas[i]), u2)
@@ -24,8 +22,8 @@ def paraller_power(A, vector, max_iterations, tolerance, alphas):
             for i in range(s):
                 x_k[i] = x_k_1[i] - np.dot(alphas[i], u1)
             
-            u1 = multiplicacionMatrizVector(A, u1)
-            u2 = multiplicacionMatrizVector(A, u2)
+            u1 = np.dot(A, u1)
+            u2 = np.dot(A, u2)
 
             for i in range(s):
                 x_k[i] = np.dot(alphas[i], u1) + x_k[i] + np.dot((1-alphas[i])*alphas[i], u2)
@@ -52,7 +50,7 @@ def paraller_power_modified(A, vector, max_mv, tolerance, alphas):
     r = np.ones((s, N))
     res = np.ones(s)
 
-    u = multiplicacionMatrizVector(A, v) - v
+    u = np.dot(A, v) - v
     
     for i in range(s):
         r[i] = alphas[i]*u
@@ -63,7 +61,7 @@ def paraller_power_modified(A, vector, max_mv, tolerance, alphas):
     mv=1
 
     while max(res) >= tolerance and mv <= max_mv:
-        u = multiplicacionMatrizVector(A,v)
+        u = np.dot(A,v)
         mv += 1
         
         for i in range(s):

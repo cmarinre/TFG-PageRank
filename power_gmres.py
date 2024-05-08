@@ -1,7 +1,7 @@
 
 import numpy as np
 import time
-from funciones_comunes import modificarMatriz, multiplicacionMatrizVector, multiplicacionValorVector, multiplicacionValorMatriz
+from funciones_comunes import modificarMatriz
 
 from gmres_reiniciado import GMRES_m
 
@@ -22,16 +22,16 @@ def power_gmres(Matriz, M, b, x_0, max_it, tol, alpha_1, m=2):
             num_it=0
             while num_it < max_it and r>tol:
                 x = x/np.linalg.norm(x, ord=1)
-                r = np.linalg.norm(multiplicacionMatrizVector(M, x)-x, ord=2)
+                r = np.linalg.norm(np.dot(M, x)-x, ord=2)
                 r_0 = r
                 r_1 = r
                 ratio = 0
                 while ratio < alpha_1 and r > tol:
-                    x = multiplicacionMatrizVector(M, x)
-                    r = np.linalg.norm(multiplicacionMatrizVector(M, x)-x, ord=2)
+                    x = np.dot(M, x)
+                    r = np.linalg.norm(np.dot(M, x)-x, ord=2)
                     ratio = r/r_0
                     r_0 = r
-                x = multiplicacionMatrizVector(M, x)
+                x = np.dot(M, x)
                 x = x/np.linalg.norm(x, ord=1)
                 if(r/r_1 > alpha_1):
                     max_it = max_it+1
@@ -66,10 +66,10 @@ if __name__ == "__main__":
 
     # Nuestro vector b, que en nuestro caso es (1-alpha)v
     v = np.ones(N) / N    
-    b = multiplicacionValorVector(1-alpha, v)
+    b = np.dot(1-alpha, v)
     
     # Nuestra matriz, que es (I-alpha(A))
-    Matriz = np.eye(N) - np.array(multiplicacionValorMatriz(alpha, A))
+    Matriz = np.eye(N) - np.array(np.dot(alpha, A))
 
     # Necesitamos un vector inicial x_0
     x_0 = np.random.rand(N)

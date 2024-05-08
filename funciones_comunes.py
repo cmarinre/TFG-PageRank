@@ -26,25 +26,6 @@ def matrizPageRank(n):
     
     return matrix
 
-# Función para multiplicar dos matrices.
-def multiplicacionDosMatrices(A, B):
-
-    #Comprobamos que se puedan multiplicar
-    if len(A[0]) != len(B):
-        print("No se puede multiplicar estas matrices.")
-        return None
-
-    # Inicializamos el vector resultado 
-    resultado = np.zeros((len(A), len(B[0])))
-
-    # Multiplicamos las matrices
-    for i in range(len(A)):
-        for j in range(len(B[0])):
-            for k in range(len(B)):
-                resultado[i][j] += A[i][k] * B[k][j]
-
-    return resultado
-
 # Función para multiplicar una matriz y un vector.
 def multiplicacionMatrizVector(A, v):
     N, n = len(A), len(A[0])
@@ -63,6 +44,7 @@ def multiplicacionMatrizVector(A, v):
             resultado[i] += A[i][j] * v[j]
     
     return resultado
+
 
 # Función para multiplicar una matriz y un vector sabiendo que algunas filas de la matriz están completamente a cero.
 # A es la matriz, v el vector y ceros el vector que tiene un 0 en las filas de A normales y un 1 en la posición de las filas que están a 0
@@ -90,64 +72,13 @@ def multiplicacionMatrizVectorConCeros(A, v, ceros):
                 resultado[i] += A[i][j] * v[j]
     return resultado
 
-# Función para multiplicar dos vectores.
-def multiplicacionDosVectores(V1, V2):
-    #Guardamos la dim de la matriz
-    n = len(V1)
-
-    #Comprobamos que se puedan multiplicar
-    if n != len(V2):
-        print("No se puede multiplicar esta matriz y este vector.")
-        return None
-    
-    # Inicializamos el vector resultado 
-    resultado = 0
-    
-    # Multiplicamos la matriz por el vector
-    for i in range(n):
-        resultado += V1[i] * V2[i]
-    
-    return resultado
-    
-# Función para multiplicar un valor por un vector.
-def multiplicacionValorVector(k, v):
-
-    n = len(v)
-    # Inicializamos el vector resultado 
-    resultado = np.zeros(n)
-    # Multiplicamos la matriz por el vector
-    for i in range(n):
-        resultado[i] = k * v[i]
-
-    return resultado
-
-# Función para multiplicar una matriz cuadrada por un valor.
-def multiplicacionValorMatriz(k, A):
-    filas = len(A)
-    columnas = len(A[0])
-    A_copy = np.zeros((filas, columnas))  # Creamos una copia de la matriz original
-    for i in range(filas):
-        for j in range(columnas):
-            A_copy[i][j] = A[i][j] * k  # Multiplicamos cada elemento por k en la copia
-
-    return A_copy
-
-# Función para sumar dos matrices.
-def sumaDosMatrices(A, B):
-    filas = len(A)
-    columnas = len(A[0])
-    for i in range(filas):
-        for j in range(columnas):
-            A[i][j] = A[i][j] + B[i][j]
-    return A
-
 
 # Función que dada una matriz A y un escalas alpha devuelve la matriz modificada para ser estocástica por columnas y con dim(V_1(A))=1
 def modificarMatriz(A, alpha):
 
     n = len(A)
     S = [[1/n] * (n) for _ in range(n)]
-    M = multiplicacionValorMatriz(alpha, A) + multiplicacionValorMatriz((1-alpha), S)
+    M = np.dot(alpha, A) + np.dot((1-alpha), S)
     return M
 
 def arreglarNodosColgantes(A):

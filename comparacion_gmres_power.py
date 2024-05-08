@@ -1,10 +1,13 @@
+import copy
 import time
+
 import numpy as np
+
 from comparacion_gmres import comparacion_gmres
 from comparacion_powers import comparacionPowersMult
-from funciones_comunes import matrizPageRank, modificarMatriz, multiplicacionValorMatriz, multiplicacionValorVector
+from funciones_comunes import matrizPageRank, modificarMatriz
 from power_gmres import power_gmres
-import copy
+
 
 def ejecucionPowerGmres(Matriz, M, b, x_0, max_it, tol, alpha_1, m):
     
@@ -38,10 +41,10 @@ if __name__ == "__main__":
 
     # Nuestro vector b, que en nuestro caso es (1-alpha)v
     v = np.ones(N) / N
-    b = multiplicacionValorVector(1-alpha, v)
+    b = np.dot(1-alpha, v)
 
     # Nuestra matriz, que es (I-alpha(A))
-    Matriz = np.eye(N) - np.array(multiplicacionValorMatriz(alpha, copy.deepcopy(A)))
+    Matriz = np.eye(N) - np.array(np.dot(alpha, copy.deepcopy(A)))
 
     tol = 1e-20
     max_it = 10000

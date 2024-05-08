@@ -65,7 +65,7 @@ def comparacionPowersMult(A, x_0, max_it, tol):
 
 
 # Función que ejecuta el método de las potencias estandar
-def ejecucionPowerEstandar(A, max_it, tol):
+def ejecucionPowerEstandar(A, x_0, max_it, tol):
 
     # Registro del tiempo de inicio
     start_time1 = time.time()
@@ -80,7 +80,7 @@ def ejecucionPowerEstandar(A, max_it, tol):
     print("Número de iteraciones:", num_it1)
     # print("Suma de los valores del vector propio para asegurar que su norma 1 es igual a 1:", np.sum(eigenvector1))
     print("Vector propio:", np.array(eigenvector1[0]))
-
+    return eigenvector1, num_it1
 
 
 
