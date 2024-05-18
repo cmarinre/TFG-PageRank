@@ -17,16 +17,17 @@ def power_method(matrix, vector, max_iterations, tolerance):
         new_vector = np.dot(matrix, vector)
         
         # Aquí deberíamos dividir por la norma pero la norma siempre es 1.
-        # new_vector = new_vector / np.linalg.norm(new_vector, ord=1)
+        new_vector = new_vector / np.linalg.norm(new_vector, ord=1)
 
         # Comprobación de convergencia
         resta = [new_vector[i] - vector[i] for i in range(min(len(new_vector), len(vector)))]
-        if np.linalg.norm(resta, ord=1) < tolerance:
+        if np.linalg.norm(resta, ord=2) < tolerance:
             break
+
 
         # Guardamos el vector nuevo
         vector = new_vector
-
+    print(np.linalg.norm(resta, ord=2))
     return vector, i
 
 # Método de las potencias estándar, calculando la convergencia como la convergencia de las componentes una a una

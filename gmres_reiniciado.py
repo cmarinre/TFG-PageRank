@@ -107,19 +107,18 @@ def GMRES_m(A, b, x_0, max_it):
         num_columnas += 1
 
         n +=1
-    
     return x, conver
 
 
 # La idea de este método es ejecutar n veces el método y poner como
 # Vector inicial el vector generado por el anterior GMRES.
-def GMRESReiniciado(Matriz, b, x_0, tol, m, max_it):
+def GMRESReiniciado(A, b, x_0, tol, m, max_it):
         
     conver = 1
     it=0
     while conver>tol and it<max_it:
         # Aplicación del método GMRES
-        x_n, conver = GMRES_m(Matriz, b, x_0, m)
+        x_n, conver = GMRES_m(A, b, x_0, m)
         x_0 = x_n
         it+=1
 
@@ -135,14 +134,14 @@ if __name__ == "__main__":
     # A = matrizPageRank(30)
     # print("matriz creada")
 
-    A = np.array([[1/2, 1/3, 0, 0],
+    P = np.array([[1/2, 1/3, 0, 0],
             [0, 1/3, 0, 1],
             [0, 1/3, 1/2, 0],
             [1/2, 0, 1/2, 0]])
 
 
     alpha = 0.85
-    N = len(A)
+    N = len(P)
 
     # Primero formateamos nuestro problema a la forma Ax=b
     # Nuestro sistema es de la forma (I-alphaA)x = (1-alpha)v
@@ -151,15 +150,15 @@ if __name__ == "__main__":
     v = np.ones(N) / N    
     b = np.dot(1-alpha, v)
     
-    # Nuestra matriz, que es (I-alpha(A))
-    Matriz = np.eye(N) - np.array(np.dot(alpha, A))
+    # Nuestra matriz, que es A=(I-alpha(P))
+    A = np.eye(N) - np.array(np.dot(alpha, P))
 
     # Necesitamos un vector inicial x_0
     x_0 = np.random.rand(N)
     x_0 = x_0 / np.linalg.norm(np.array(x_0), ord=1)
 
     start_time = time.time()
-    x_n, n = GMRESReiniciado(Matriz, b, x_0, 0.0001, 2, 100)
+    x_n, n = GMRESReiniciado(A, b, x_0, 0.0001, 2, 100)
     end_time = time.time()
     elapsed_time = end_time - start_time
 
