@@ -96,6 +96,24 @@ def arreglarNodosColgantes(A):
 
     return nueva_matriz
 
-if __name__ == "__main__":
 
-    print(".")
+def obtenerSolucionPython(A):
+    eigenvalues, eigenvectors = np.linalg.eig(A)
+
+    # Encuentra el índice del valor propio que es igual a 1
+    index = np.where(np.isclose(eigenvalues, 1))[0][0]
+
+    # Obtiene el vector propio correspondiente
+    eigenvector = eigenvectors[:, index]
+    eigenvector = eigenvector / np.linalg.norm(eigenvector, ord=1)
+    return eigenvector
+
+def residuoDosVectores(x1, x2):
+    if(x1[0]<0): x1 = np.dot(-1, x1)
+    if(x2[0]<0): x2 = np.dot(-1, x2)
+    resta = [abs(x1[i] - x2[i]) for i in range(len(x1))]
+    diferencia = np.linalg.norm(resta, ord=1)
+    return diferencia
+
+
+

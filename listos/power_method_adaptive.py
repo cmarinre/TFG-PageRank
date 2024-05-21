@@ -47,7 +47,8 @@ def adaptive_power_method(matrix, vector, max_iterations, tolerance):
         
 
         # Comprobación de convergencia
-        if np.allclose(x_k1, x_k, atol=tolerance):
+        resta = [abs(x_k1[i] - x_k[i]) for i in range(len(vector))]
+        if all(valor < tolerance for valor in resta):
             break
 
         # Guardamos el vector nuevo
@@ -100,7 +101,8 @@ def adaptive_power_method_k(matrix, vector, max_iterations, tolerance, k):
         
 
         # Comprobación de convergencia
-        if np.allclose(x_k1, x_k, atol=tolerance):
+        resta = [abs(x_k1[i] - x_k[i]) for i in range(len(vector))]
+        if all(valor < tolerance for valor in resta):
             break
 
         # Guardamos el vector nuevo

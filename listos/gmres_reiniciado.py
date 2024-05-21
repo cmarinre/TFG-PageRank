@@ -144,7 +144,7 @@ if __name__ == "__main__":
     N = len(P)
 
     # Primero formateamos nuestro problema a la forma Ax=b
-    # Nuestro sistema es de la forma (I-alphaA)x = (1-alpha)v
+    # Nuestro sistema es de la forma (I-alphaP)x = (1-alpha)v
 
     # Nuestro vector b, que en nuestro caso es (1-alpha)v
     v = np.ones(N) / N    
@@ -158,12 +158,12 @@ if __name__ == "__main__":
     x_0 = x_0 / np.linalg.norm(np.array(x_0), ord=1)
 
     start_time = time.time()
-    x_n, n = GMRESReiniciado(A, b, x_0, 0.0001, 2, 100)
+    x_n, n = GMRESReiniciado(A, b, x_0, 1e-12, 2, 10000)
     end_time = time.time()
     elapsed_time = end_time - start_time
 
 
-    print("El tiempo de ejecución de GMRES fue de: {:.5f} segundos".format(elapsed_time))
+    print("El tiempo de ejecución de GMRES REINICIADO fue de: {:.5f} segundos".format(elapsed_time))
     
     x_n_norm = x_n / np.linalg.norm(np.array(x_n), ord=1)
     print("Vector solución normalizado", x_n_norm)

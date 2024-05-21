@@ -1,4 +1,5 @@
 import copy
+import time
 
 import numpy as np
 
@@ -94,16 +95,16 @@ def paraller_power_modified(P, vector, max_mv, tolerance, alphas):
             
             # Para que nuestros vectores estén siempre normalizados
             x[i] = x[i] / np.linalg.norm(x[i], ord=1)
-        print(num_it)
-        print(res)
-    print(mv)
-    return x, num_it
+
+        if((mv%100)==0): 
+            print(mv)
+            print(num_it)
+    return x, num_it, res
 
 
 def obtenerComparacionesNumpy(P, alphas, x):
     N = len(P)
     S = np.ones((N, N))/N
-    print(S)
     M = np.dot(0.85, P) + np.dot(0.15, S)
 
     normas = np.zeros(len(alphas))
@@ -127,32 +128,37 @@ def obtenerComparacionesNumpy(P, alphas, x):
 if __name__ == "__main__":
     # P = read_data("./datos/minnesota2642.mtx")
     # P = read_data("./datos/hollins6012.mtx")
-    # P = read_data("./datos/stanford9914.mtx")
-    # P = arreglarNodosColgantes(P)
+    P = read_data("./datos/stanford9914.mtx")
+    P = arreglarNodosColgantes(P)
 
-
-    P = np.array([[1/2, 1/3, 0, 0],
-                [0, 1/3, 0, 1],
-                [0, 1/3, 1/2, 0],
-                [1/2, 0, 1/2, 0]])
+    # P = np.array([[1/2, 1/3, 0, 0],
+    #               [0, 1/3, 0, 1],
+    #               [0, 1/3, 1/2, 0],
+    #               [1/2, 0, 1/2, 0]])
     
     N = len(P)
-    v = np.ones(N)
+    v = np.ones(N)/N
     tol=1e-4
+    max_it = 100000
 
     alphas = np.zeros(99)
     for i in range(99):
         alphas[i] = (i+1)*0.01
-    max_it = 500000
 
+    # alphas = np.array([0.2, 0.4, 0.5, 0.6, 0.85, 0.9])
+    print(alphas)
 
-    x, num_it = paraller_power_modified(P, v, max_it, tol, alphas)
+    start_time = time.time()
+    x, num_it, res = paraller_power_modified(P, v, max_it, tol, alphas)
+    end_time = time.time()
+    elapsed_time = end_time - start_time
 
+    print("El tiempo de ejecución del parallel power fue de: {:.5f} segundos".format(elapsed_time))
 
-    normas = obtenerComparacionesNumpy(P, alphas, x)
+    # normas = obtenerComparacionesNumpy(P, alphas, x)
 
     print("Vectores solución", x)
     print("Número de iteraciones", num_it)
-    print("Normas residuales", normas)
-
+    print("Residuo", res)
+    # print("Normas residuales", normas)
 

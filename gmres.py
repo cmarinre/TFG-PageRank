@@ -124,27 +124,23 @@ def GMRES(A, b, x_0, max_it, tol):
 
 if __name__ == "__main__":
 
-    # print("Creando matriz")
-    # A = matrizPageRank(3)
-    # print("matriz creada")
-
-    A = np.array([[1/2, 1/3, 0, 0],
+    P = np.array([[1/2, 1/3, 0, 0],
             [0, 1/3, 0, 1],
             [0, 1/3, 1/2, 0],
             [1/2, 0, 1/2, 0]])
 
     alpha = 0.85
-    N = len(A)
+    N = len(P)
 
     # Primero formateamos nuestro problema a la forma Ax=b
-    # Nuestro sistema es de la forma (I-alphaA)x = (1-alpha)v
+    # Nuestro sistema es de la forma (I-alphaP)x = (1-alpha)v
 
     # Nuestro vector b, que en nuestro caso es (1-alpha)v
     v = np.ones(N) / N    
     b = np.dot(1-alpha, v)
     
     # Nuestra matriz, que es (I-alpha(A))
-    Matriz = np.eye(N) - np.array(np.dot(alpha, A))
+    Matriz = np.eye(N) - np.array(np.dot(alpha, P))
     
     # Necesitamos un vector inicial x_0
     x_0 = np.random.rand(N)
@@ -153,7 +149,7 @@ if __name__ == "__main__":
     # Registro del tiempo de inicio
     start_time = time.time()
     # Aplicación del método GMRES
-    x_n, it = GMRES(Matriz, b, x_0, 100, 0.000000000001)
+    x_n, it = GMRES(Matriz, b, x_0, 100000, 1e-12)
     # Registro del tiempo de finalización
     end_time = time.time()
     # Cálculo del tiempo transcurrido
