@@ -77,7 +77,7 @@ def multiplicacionMatrizVectorConCeros(A, v, ceros):
 def modificarMatriz(A, alpha):
 
     n = len(A)
-    S = [[1/n] * (n) for _ in range(n)]
+    S = np.ones((n,n))/n
     M = np.dot(alpha, A) + np.dot((1-alpha), S)
     return M
 
@@ -109,11 +109,19 @@ def obtenerSolucionPython(A):
     return eigenvector
 
 def residuoDosVectores(x1, x2):
+
     if(x1[0]<0): x1 = np.dot(-1, x1)
     if(x2[0]<0): x2 = np.dot(-1, x2)
     resta = [abs(x1[i] - x2[i]) for i in range(len(x1))]
     diferencia = np.linalg.norm(resta, ord=1)
+
     return diferencia
 
 
+def guardar_diferencias_txt(diferencias, filename):
+    with open(filename, 'w') as f:
+        for tiempo, diferencia in diferencias:
+            tiempo_str = str(tiempo).replace('.', ',')
+            diferencia_str = str(diferencia).replace('.', ',')
+            f.write(f"{tiempo_str};{diferencia_str}\n")
 

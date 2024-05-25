@@ -43,6 +43,50 @@ def read_data(file_path):
 
     return matrix
 
+
+def read_data_prueba(file_path):
+   # Leemos el archivo
+    with open(file_path, 'r') as file:
+        data = file.readlines()
+
+    # Obtenemos el número de nodos
+    num_nodes, _, _ = map(int, data[0].split())
+
+    # Eliminamos esa fila
+    data = data[1:]
+    
+    # Inicializamos la matriz con ceros
+    matrix = np.zeros((num_nodes, num_nodes))
+
+    # Para cada nodo
+    while data:
+        # Obtenemos la primera linea de ese nodo y cogemos el nodo 
+        _, node, _ = map(float, data[0].split())
+        node = int(node)
+
+        # Creamos una lista para almacenar los enlaces de este nodo
+        links = []
+
+        # Iteramos hasta encontrar el próximo nodo
+        for line in data:
+            values = line.split()
+            
+            # Hemos llegado al próximo nodo
+            if int(values[1]) != node:
+                break  
+            # Añadimos el enlace (omitiendo el tercer valor)
+            links.append((int(values[0]), int(values[1])))
+
+        # Para cada pareja de links que tenemos en el array
+        for link in links:
+            # Guardamos en la matriz los datos el link y partido por el núm de links, así ya va normalizado.
+            matrix[link[0] - 1, node - 1] = 1 / len(links)
+
+        # Eliminamos las líneas correspondientes al nodo procesado
+        del data[:len(links)]
+
+    return matrix
+
 if __name__ == "__main__":
     A = read_data("./datos/prueba_stanford.mtx")
     print(A)

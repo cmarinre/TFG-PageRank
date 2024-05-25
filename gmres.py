@@ -47,9 +47,8 @@ def GMRES(A, b, x_0, max_it, tol):
         # Arnoldi
         i=0
         while i <= n:                
-            h[i][n] = np.dot(V[:,i], t)
-            aux = np.dot(h[i][n], V[:,i])
-            t = [t[k] - aux[k] for k in range(min(len(t), len(aux)))]
+            h[i][n] = np.dot(V[:,i], t)                      
+            t = t-np.dot(h[i][n], V[:,i])
             i+=1
         t_norm = np.linalg.norm(t, ord=2)
         h[n+1][n] = t_norm
