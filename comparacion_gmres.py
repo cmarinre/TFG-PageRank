@@ -88,8 +88,8 @@ def comparacion_gmres(A, x_0, alpha, max_it, tol, m1, m2, m3):
 
 if __name__ == "__main__":
 
-    P = read_data("./datos/minnesota2642.mtx")
-    # P = read_data("./datos/hollins6012.mtx")
+    # P = read_data("./datos/minnesota2642.mtx")
+    P = read_data("./datos/hollins6012.mtx")
     # P = read_data("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
 

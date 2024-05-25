@@ -77,18 +77,18 @@ def power_gmres(P, b, alpha, x, max_it, tol, alpha_1, m, vector_solucion_python)
 
 if __name__ == "__main__":
 
-    P = read_data_prueba("./datos/prueba.mtx")
-    # P = read_data("./datos/minnesota2642.mtx")
+    # P = read_data_prueba("./datos/prueba.mtx")
+    P = read_data("./datos/minnesota2642.mtx")
     # P = read_data("./datos/hollins6012.mtx")
     # P = read_data("./datos/stanford9914.mtx")
-    # P = arreglarNodosColgantes(P)
+    P = arreglarNodosColgantes(P)
 
     # P = np.array([[1/2, 1/3, 0, 0],
     #               [0, 1/3, 0, 1],
     #               [0, 1/3, 1/2, 0],
     #               [1/2, 0, 1/2, 0]])
 
-    alpha = 0.99
+    alpha = 0.85
 
     M = modificarMatriz(P, alpha)
 

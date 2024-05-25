@@ -9,23 +9,20 @@ def GMRES(A, b, x_0, max_it, tol):
     N = len(A)
     
     # Creamos el vec r_0, que es b-Ax_0
-    Ax0 = np.dot(A, x_0)
-    r_0 = np.array(b) - np.array(Ax0)
+    r_0 = b - np.dot(A, x_0)
     
-    # Establecemos el número de columnas inicial a 2
-    num_columnas = 2
 
     # Generamos una matriz V y una h con todos sus valores a 0
-    V = np.zeros((N, num_columnas))
-    h = np.zeros((num_columnas, num_columnas-1))
+    V = np.zeros((N, max_it+1))
+    h = np.zeros((max_it+1, max_it))
 
 
     # Establecemos el v_1 al vector inicial normalizado.
     r_0_norm = np.linalg.norm(r_0, ord=2)
-    V[:, 0] = np.array(r_0 / r_0_norm)
+    V[:, 0] = r_0 / r_0_norm
         
     # Inicializamos el vector g
-    g = np.zeros(num_columnas)
+    g = np.zeros(max_it+1)
     g[0] = r_0_norm
     
     # Guardamos la norma para no repetir la operación en cada bucle
@@ -36,7 +33,6 @@ def GMRES(A, b, x_0, max_it, tol):
     
     # Como trabajamos con matrices a las que accedemos desde el 0, reducimos 1 el número N  y num_cols
     N = N-1
-    num_columnas = num_columnas - 1
     
     no_convergido = True
     n=0
@@ -45,28 +41,27 @@ def GMRES(A, b, x_0, max_it, tol):
         t = np.dot(A, V[:,n])
         
         # Arnoldi
-        i=0
-        while i <= n:                
+        for i in range(0, n+1):           
             h[i][n] = np.dot(V[:,i], t)                      
             t = t-np.dot(h[i][n], V[:,i])
-            i+=1
+
         t_norm = np.linalg.norm(t, ord=2)
+
         h[n+1][n] = t_norm
         V[:,n+1] = t / t_norm
         
         # Givens
-        j=0
-        while j<=n-1:     
-            c_j = abs(h[j][j]) / (np.sqrt( h[j][j]*h[j][j] + h[j+1][j]*h[j+1][j]  ))
+        for j in range(0, n):
+            c_j = abs(h[j][j]) / (np.sqrt( h[j][j]**2 + h[j+1][j]**2  ))
             s_j = (h[j+1][j] / h[j][j])*c_j
-            aux1 = c_j*h[j][n] + s_j*h[j+1][n]
-            aux2 = -s_j*h[j][n] + c_j*h[j+1][n]
-            h[j][n] = aux1
-            h[j+1][n] = aux2
-            j += 1
 
-        c_n = abs(h[n][n]) / (np.sqrt( h[n][n]*h[n][n] + h[n+1][n]*h[n+1][n]  ))
-        s_n = (h[n+1][n] / h[n][n])*c_n
+            apply_givens_rotation(h, c_j, s_j, j, n)
+
+
+        delta = np.sqrt(h[n, n] ** 2 + h[n + 1, n] ** 2)
+        c_n = h[n, n] / delta
+        s_n = h[n + 1, n] / delta
+
         h[n][n] = c_n*h[n][n] + s_n*h[n+1][n]
         h[n+1][n] = 0
         
@@ -79,39 +74,11 @@ def GMRES(A, b, x_0, max_it, tol):
         if conver <= tol and n>0:
             # La matrices con las que hemos estado tratando eran V_{n+1} y H_{n+1}.
             # Para este caso necesitamos V_n y H_n luego las reducimos.
-            h_reducida = h[:(n+1), :(n+1)]
-            v_reducida = V[:, :(n+1)]
-            # Lo mismo con el vector g
-            g_reducido = g[:(n+1)]
-            # Calculamos x = x_0 + V_{n} H^{-1}_{n} g 
-            inversa = np.linalg.inv(h_reducida)
-            VnH_1n = np.dot(v_reducida, inversa)
-            VnH_1ng = np.dot(VnH_1n, g_reducido)
-            x = x_0 + VnH_1ng
+            y = np.linalg.solve(h[:(n+1), :(n+1)], g[:(n+1)])
+            x = x_0 + np.dot(V[:, :(n+1)], y)
             # Para salir del bucle.
             no_convergido = False
 
-
-        # Aumentar el tamaño de la matriz V
-        # Creamos columna a 0
-        nueva_col = np.zeros((N+1, 1))
-        # La añadimos
-        V = np.hstack((V, nueva_col))
-
-        # Aumentar el tamaño de la matriz h
-        # Añadir una nueva fila al final
-        nueva_fila = np.zeros((1, num_columnas))
-        h = np.vstack((h, nueva_fila))
-
-        # Añadir una nueva columna al final
-        nueva_columna = np.zeros((num_columnas+2, 1))
-        h = np.hstack((h, nueva_columna))
-
-        # Aumentar el tamaño del vector g
-        g = np.append(g, [0])
-
-        #Aumentamos el número de columnas y la iteración
-        num_columnas += 1
         n +=1
 
     
@@ -119,7 +86,10 @@ def GMRES(A, b, x_0, max_it, tol):
     return x,n
 
 
-
+def apply_givens_rotation(h, c, s, k, i):
+    temp = c * h[k, i] + s * h[k + 1, i]
+    h[k + 1, i] = -s * h[k, i] + c * h[k + 1, i]
+    h[k, i] = temp
 
 if __name__ == "__main__":
 

@@ -59,8 +59,8 @@ def power_method(matrix, vector, max_iterations, tolerance, vector_solucion_pyth
 
 if __name__ == "__main__":
 
-    P = read_data_prueba("./datos/prueba.mtx")
-    # P = read_data("./datos/minnesota2642.mtx")
+    # P = read_data_prueba("./datos/prueba.mtx")
+    P = read_data("./datos/minnesota2642.mtx")
     # P = read_data("./datos/hollins6012.mtx")
     # P = read_data("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     #               [0, 1/3, 1/2, 0],
     #               [1/2, 0, 1/2, 0]])
 
-    alpha = 0.99
+    alpha = 0.85
 
     M = modificarMatriz(P, alpha)
 
