@@ -12,23 +12,19 @@ def arnoldi_givens(A, b, x_0, max_it, alpha_k, mv):
     N = len(A)
     
     # Y nuestro vector r_0, b-Ax_0
-    Ax0 = np.dot(A, x_0)
-    r_0 = np.array(b) - np.array(Ax0)
+    r_0 = b - np.dot(A, x_0)
 
-
-    # Establecemos el número de columnas inicial a 2
-    num_columnas = 2
 
     # Generamos una matriz V y una h con todos sus valores a 0
-    V = np.zeros((N, num_columnas))
-    h = np.zeros((num_columnas, num_columnas-1))
+    V = np.zeros((N, max_it+1))
+    h = np.zeros((max_it+1, max_it))
     
     # Establecemos el v_1 al vector inicial normalizado.
     r_0_norm = np.linalg.norm(r_0, ord=2)
     V[:, 0] = np.array(r_0 / r_0_norm)
     
     # Inicializamos el vector g
-    g = np.zeros(num_columnas)
+    g = np.zeros(max_it+1)
     g[0] = r_0_norm
     
     betae1 =  np.zeros(N)
@@ -39,15 +35,14 @@ def arnoldi_givens(A, b, x_0, max_it, alpha_k, mv):
     
     # Como trabajamos con matrices a las que accedemos desde el 0, reducimos 1 el número N  y num_cols
     N = N-1
-    num_columnas = num_columnas - 1
     
     n=0
     while n<=(max_it-1):
 
         t = np.dot(A, V[:,n])
+        
         # Arnoldi
-        i=0
-        while i <= n:                
+        for i in range(0, n+1):           
             h[i][n] = np.dot(V[:,i], t)                      
             t = t-np.dot(h[i][n], V[:,i])
             i+=1
@@ -56,18 +51,19 @@ def arnoldi_givens(A, b, x_0, max_it, alpha_k, mv):
         V[:,n+1] = t / t_norm
         
         # Givens
-        j=0
-        while j<=n-1:        
-            c_j = abs(h[j][j]) / (np.sqrt( h[j][j]*h[j][j] + h[j+1][j]*h[j+1][j]  ))
+        for j in range(0, n):      
+            c_j = abs(h[j][j]) / (np.sqrt( h[j][j]**2 + h[j+1][j]**2  ))
             s_j = (h[j+1][j] / h[j][j])*c_j
-            aux1 = c_j*h[j][n] + s_j*h[j+1][n]
-            aux2 = -s_j*h[j][n] + c_j*h[j+1][n]
-            h[j][n] = aux1
-            h[j+1][n] = aux2
-            j += 1
 
-        c_n = abs(h[n][n]) / (np.sqrt( h[n][n]*h[n][n] + h[n+1][n]*h[n+1][n]  ))
-        s_n = (h[n+1][n] / h[n][n])*c_n
+            temp = c_j*h[j][n] + s_j*h[j+1][n]
+            h[j+1][n] = -s_j*h[j][n] + c_j*h[j+1][n]
+            h[j][n] = temp
+                     
+
+        delta = np.sqrt(h[n, n] ** 2 + h[n + 1, n] ** 2)
+        c_n = h[n, n] / delta
+        s_n = h[n + 1, n] / delta
+
         h[n][n] = c_n*h[n][n] + s_n*h[n+1][n]
         h[n+1][n] = 0
         
@@ -75,43 +71,19 @@ def arnoldi_givens(A, b, x_0, max_it, alpha_k, mv):
         g[n] = c_n*g[n]
         
         if n==(max_it-1):
-            h_reducida = h[:(n+1), :(n+1)]
-            v_reducida = V[:, :(n+1)]
-            g_reducido = g[:(n+1)]
-            inversa = np.linalg.inv(h_reducida)
-            H_1ng = np.dot(inversa, g_reducido)
-            VnH_1ng = np.dot(v_reducida, H_1ng)
-            x = x_0 + VnH_1ng
+            y = np.linalg.solve(h[:(n), :(n)], g[:(n)])
+            aux = np.dot(V[:, :(n)], y)
+            x = x_0 + aux
             x = x/np.linalg.norm(x, ord=1)
 
 
-            res = alpha_k*(np.linalg.norm(betae1 - np.dot(v_reducida, H_1ng), ord=2))
+            res = alpha_k*(np.linalg.norm(betae1 - aux, ord=2))
             mv = mv + n
 
-        # Aumentar el tamaño de la matriz V
-        # Creamos columna a 0
-        nueva_col = np.zeros((N+1, 1))
-        # La añadimos
-        V = np.hstack((V, nueva_col))
-    
-
-        # Aumentar el tamaño de la matriz h
-        # Añadir una nueva fila al final
-        nueva_fila = np.zeros((1, num_columnas))
-        h = np.vstack((h, nueva_fila))
-
-        # Añadir una nueva columna al final
-        nueva_columna = np.zeros((num_columnas+2, 1))
-        h = np.hstack((h, nueva_columna))
-
-        # Aumentar el tamaño del vector g
-        g = np.append(g, [0])
-
-        #Aumentamos el número de columnas y la iteración
-        num_columnas += 1
+        #Aumentamos la iteración
         n +=1
 
-    return x, res, h_reducida, H_1ng, v_reducida, mv, r_0_norm
+    return x, res, h[:(n), :(n)], y, V[:, :(n)], mv, r_0_norm
 
 
 
@@ -180,10 +152,7 @@ def  parallel_gmres(P, x_0, max_it, tol, alphas, m):
                     if num_it[i]==0: num_it[i] = mv
         x_0 = copy.deepcopy(x)
         iter += 1
-        if(iter%30==0): 
-            print("----------------- ITERACION -----------------", iter)
-            print(num_it)
-            # print(res)
+
     return x, num_it, res
 
 
@@ -191,16 +160,16 @@ def  parallel_gmres(P, x_0, max_it, tol, alphas, m):
 if __name__ == "__main__":
     # P = read_data("./datos/minnesota2642.mtx")
     # P = read_data("./datos/hollins6012.mtx")
-    P = read_data("./datos/stanford9914.mtx")
-    P = arreglarNodosColgantes(P)
+    # P = read_data("./datos/stanford9914.mtx")
+    # P = arreglarNodosColgantes(P)
 
-    # P = np.array([[1/2, 1/3, 0, 0],
-    #               [0, 1/3, 0, 1],
-    #               [0, 1/3, 1/2, 0],
-    #               [1/2, 0, 1/2, 0]])
+    P = np.array([[1/2, 1/3, 0, 0],
+                  [0, 1/3, 0, 1],
+                  [0, 1/3, 1/2, 0],
+                  [1/2, 0, 1/2, 0]])
     
     N = len(P)
-    tol=1e-4
+    tol=1e-6
     max_it = 10000
     m = 2
 
@@ -208,12 +177,12 @@ if __name__ == "__main__":
     for i in range(99):
         alphas[i] = (i+1)*0.01
     # alphas = np.array([0.2, 0.4, 0.5, 0.6, 0.85, 0.9])
-    print(alphas)
+    # print(alphas)
 
+    # x_0 = np.random.rand(len(P))
+    # x_0 = x_0 / np.linalg.norm(np.array(x_0), ord=1)
+    x_0 = np.ones(N)/N
 
-    x_0 = np.random.rand(len(P))
-    x_0 = x_0 / np.linalg.norm(np.array(x_0), ord=1)
-    
     start_time = time.time()
     x, num_it, res = parallel_gmres(P, np.tile(x_0, (len(alphas), 1)), max_it, tol, alphas, m)
     end_time = time.time()
@@ -225,6 +194,6 @@ if __name__ == "__main__":
 
     print("Vectores solución", x)
     print("Número de iteraciones", num_it)
-    print("Residuo", res)
+    # print("Residuo", res)
     # print("Normas residuales", normas)
 

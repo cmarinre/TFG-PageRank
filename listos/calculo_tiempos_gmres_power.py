@@ -7,7 +7,7 @@ from funciones_comunes import (arreglarNodosColgantes, guardar_diferencias_txt,
                                modificarMatriz, obtenerSolucionPython,
                                residuoDosVectores)
 from gmres_reiniciado import GMRES_m
-from read_data import read_data, read_data_prueba
+from read_data import read_data, read_data_cz1268
 
 
 def power_gmres(P, b, alpha, x, max_it, tol, alpha_1, m, vector_solucion_python):
@@ -77,8 +77,8 @@ def power_gmres(P, b, alpha, x, max_it, tol, alpha_1, m, vector_solucion_python)
 
 if __name__ == "__main__":
 
-    # P = read_data_prueba("./datos/prueba.mtx")
-    P = read_data("./datos/minnesota2642.mtx")
+    P = read_data_cz1268("./datos/cz1268.mtx")
+    # P = read_data("./datos/minnesota2642.mtx")
     # P = read_data("./datos/hollins6012.mtx")
     # P = read_data("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     #               [0, 1/3, 1/2, 0],
     #               [1/2, 0, 1/2, 0]])
 
-    alpha = 0.85
+    alpha = 0.99
 
     M = modificarMatriz(P, alpha)
 
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     end_time1 = time.time()
     elapsed_time1 = end_time1 - start_time1
 
-    print("DIFERENCIAS", diferencias)
+    # print("DIFERENCIAS", diferencias)
     print("TIEMPO", elapsed_time1)
     # print("SOLUCION", x_n)
 

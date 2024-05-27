@@ -112,7 +112,7 @@ def residuoDosVectores(x1, x2):
 
     if(x1[0]<0): x1 = np.dot(-1, x1)
     if(x2[0]<0): x2 = np.dot(-1, x2)
-    resta = [abs(x1[i] - x2[i]) for i in range(len(x1))]
+    resta = x1-x2
     diferencia = np.linalg.norm(resta, ord=1)
 
     return diferencia

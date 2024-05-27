@@ -6,7 +6,7 @@ import numpy as np
 from funciones_comunes import (arreglarNodosColgantes, guardar_diferencias_txt,
                                modificarMatriz, obtenerSolucionPython,
                                residuoDosVectores)
-from read_data import read_data, read_data_prueba
+from read_data import read_data, read_data_cz1268
 
 # Método de las potencias estándar al que le añadimos guardar cada x tiempo, la diferencia con el vector "óptimo" que buscamos
 
@@ -59,8 +59,8 @@ def power_method(matrix, vector, max_iterations, tolerance, vector_solucion_pyth
 
 if __name__ == "__main__":
 
-    # P = read_data_prueba("./datos/prueba.mtx")
-    P = read_data("./datos/minnesota2642.mtx")
+    P = read_data_cz1268("./datos/cz1268.mtx")
+    # P = read_data("./datos/minnesota2642.mtx")
     # P = read_data("./datos/hollins6012.mtx")
     # P = read_data("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     #               [0, 1/3, 1/2, 0],
     #               [1/2, 0, 1/2, 0]])
 
-    alpha = 0.85
+    alpha = 0.99
 
     M = modificarMatriz(P, alpha)
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     end_time1 = time.time()
     elapsed_time1 = end_time1 - start_time1
 
-    print("DIFERENCIAS", diferencias)
+    # print("DIFERENCIAS", diferencias)
     print("TIEMPO", elapsed_time1)
     # print("SOLUCION", x_n)
 

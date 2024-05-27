@@ -1,9 +1,12 @@
 import copy
+import time
 
 import numpy as np
 
-from funciones_comunes import (modificarMatriz, multiplicacionMatrizVector,
-                               residuoDosVectores)
+from funciones_comunes import (arreglarNodosColgantes, modificarMatriz,
+                               multiplicacionMatrizVector,
+                               obtenerSolucionPython, residuoDosVectores)
+from read_data import read_data
 
 
 # Método de las potencias estándar, calculando la convergencia con la norma 1
@@ -56,7 +59,48 @@ def power_method_convergence(matrix, vector, max_iterations, tolerance):
 
     return vector, i
 
+def obtenerComparacionesNumpy(M, x):
+
+    vector_solucion_python = obtenerSolucionPython(M)
+    print(vector_solucion_python)
+    norma = residuoDosVectores(vector_solucion_python, x)
+
+    return norma
+
+
 
 if __name__ == "__main__":
 
-    print("Aquí no hay código. Vaya a comparacion_powers.py, por favor.")
+    # P = read_data("./datos/minnesota2642.mtx")
+    # P = read_data("./datos/hollins6012.mtx")
+    P = read_data("./datos/stanford9914.mtx")
+    P = arreglarNodosColgantes(P)
+
+    # P = np.array([[1/2, 1/3, 0, 0],
+    #               [0, 1/3, 0, 1],
+    #               [0, 1/3, 1/2, 0],
+    #               [1/2, 0, 1/2, 0]])
+    
+    alpha = 0.99
+    M = modificarMatriz(P, alpha)
+
+    N = len(M)
+    # x_0 = np.random.rand(N)
+    # x_0 = x_0 / np.linalg.norm(np.array(x_0), ord=1)
+    x_0 = np.ones(N)/N
+    max_it = 10000
+    tol=1e-8
+
+    start_time1 = time.time()
+    eigenvector1, num_it1 = power_method(M, x_0, max_it, tol)
+    end_time1 = time.time()
+    elapsed_time1 = end_time1 - start_time1
+
+    # norma = obtenerComparacionesNumpy(M, eigenvector1)
+
+
+    print("El tiempo de ejecución de POWER BÁSICO fue de: {:.5f} segundos".format(elapsed_time1))
+    print("Número de iteraciones:", num_it1)
+    # print("Norma residual", norma)
+    # print("Vector solución", eigenvector1)
+

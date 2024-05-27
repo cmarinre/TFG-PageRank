@@ -44,7 +44,7 @@ def read_data(file_path):
     return matrix
 
 
-def read_data_prueba(file_path):
+def read_data_cz1268(file_path):
    # Leemos el archivo
     with open(file_path, 'r') as file:
         data = file.readlines()
