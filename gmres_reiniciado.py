@@ -3,7 +3,8 @@ import time
 
 import numpy as np
 
-from funciones_comunes import matrizPageRank
+from funciones_comunes import arreglarNodosColgantes, matrizPageRank
+from read_data import read_data
 
 
 def GMRES_m(A, b, x_0, m, tol):
@@ -31,8 +32,8 @@ def GMRES_m(A, b, x_0, m, tol):
     # Vector solucion
     x = np.zeros(N)
     
-    # Como trabajamos con matrices a las que accedemos desde el 0, reducimos 1 el número N 
-    N = N-1
+    # # Como trabajamos con matrices a las que accedemos desde el 0, reducimos 1 el número N 
+    # N = N-1
     
     n=0
     while n<=(m-1):
@@ -73,7 +74,6 @@ def GMRES_m(A, b, x_0, m, tol):
         if conver < tol:
             break
 
-
     y = np.linalg.solve(h[:(n), :(n)], g[:(n)])
     x = x_0 + np.dot(V[:, :(n)], y)
 
@@ -106,17 +106,18 @@ def GMRESReiniciado(A, b, x_0, tol, m, max_it):
 
 if __name__ == "__main__":
 
-    # print("Creando matriz")
-    # A = matrizPageRank(30)
-    # print("matriz creada")
+    P = read_data("./datos/minnesota2642.mtx")
+    # P = read_data("./datos/hollins6012.mtx")
+    # P = read_data("./datos/stanford9914.mtx")
+    P = arreglarNodosColgantes(P)
 
-    P = np.array([[1/2, 1/3, 0, 0],
-            [0, 1/3, 0, 1],
-            [0, 1/3, 1/2, 0],
-            [1/2, 0, 1/2, 0]])
+    # P = np.array([[1/2, 1/3, 0, 0],
+    #         [0, 1/3, 0, 1],
+    #         [0, 1/3, 1/2, 0],
+    #         [1/2, 0, 1/2, 0]])
 
 
-    alpha = 0.85
+    alpha = 0.99
     N = len(P)
 
     # Primero formateamos nuestro problema a la forma Ax=b
@@ -130,11 +131,13 @@ if __name__ == "__main__":
     A = np.eye(N) - np.array(np.dot(alpha, P))
 
     # Necesitamos un vector inicial x_0
-    x_0 = np.random.rand(N)
-    x_0 = x_0 / np.linalg.norm(np.array(x_0), ord=1)
+    # x_0 = np.random.rand(N)
+    # x_0 = x_0 / np.linalg.norm(np.array(x_0), ord=1)
+
+    x_0 = np.ones(N)/N
 
     start_time = time.time()
-    x_n, n = GMRESReiniciado(A, b, x_0, 1e-12, 2, 10000)
+    x_n, n = GMRESReiniciado(A, b, x_0, 1e-4, 2, 1000)
     end_time = time.time()
     elapsed_time = end_time - start_time
 

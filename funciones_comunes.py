@@ -108,6 +108,40 @@ def obtenerSolucionPython(A):
     eigenvector = eigenvector / np.linalg.norm(eigenvector, ord=1)
     return eigenvector
 
+def obtenerSolucionesNumpy(P, alphas):
+    
+    vector_solucion_python = np.zeros((len(alphas), len(P)))
+    i=0
+    for alpha in alphas:
+        M = modificarMatriz(P, alpha)
+        vector_solucion_python[i] = obtenerSolucionPython(M)
+        i+=1
+
+    return vector_solucion_python
+
+
+def obtenerComparacionesNumpySoluciones(x, soluciones):
+    normas = np.zeros(len(soluciones))
+    i=0
+    while i < len(soluciones):
+        normas[i] = residuoDosVectores(soluciones[i], x[i])
+        i+=1
+
+    return normas
+
+def obtenerComparacionesNumpy(P, alphas, x):
+    
+    normas = np.zeros(len(alphas))
+    i=0
+    for alpha in alphas:
+        M = modificarMatriz(P, alpha)
+        vector_solucion_python = obtenerSolucionPython(M)
+        print("vector python", vector_solucion_python)
+        normas[i] = residuoDosVectores(vector_solucion_python, x[i])
+        i+=1
+
+    return normas
+
 def residuoDosVectores(x1, x2):
 
     if(x1[0]<0): x1 = np.dot(-1, x1)

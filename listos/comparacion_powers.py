@@ -2,11 +2,11 @@ import copy
 import time
 
 import numpy as np
-
-from funciones_comunes import arreglarNodosColgantes, modificarMatriz
-from power_method import power_method, power_method_convergence
 from power_method_adaptive import (adaptive_power_method,
                                    adaptive_power_method_k)
+
+from funciones_comunes import arreglarNodosColgantes, modificarMatriz
+from listos.power_method import power_method, power_method_convergence
 from read_data import read_data
 
 

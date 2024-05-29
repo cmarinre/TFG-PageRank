@@ -4,7 +4,9 @@ import time
 import numpy as np
 
 from funciones_comunes import (arreglarNodosColgantes, modificarMatriz,
-                               obtenerSolucionPython, residuoDosVectores)
+                               obtenerComparacionesNumpySoluciones,
+                               obtenerSolucionesNumpy, obtenerSolucionPython,
+                               residuoDosVectores)
 from read_data import read_data
 
 
@@ -105,41 +107,7 @@ def paraller_power_modified_MedicionNumIt(P, vector, max_mv, tolerance, alphas):
             else:
                 if num_it[i]==0: num_it[i] = mv
 
-
     return x, num_it, res, mv
-
-def obtenerSolucionesNumpy(P, alphas):
-    
-    vector_solucion_python = np.zeros((len(alphas), len(P)))
-    i=0
-    for alpha in alphas:
-        M = modificarMatriz(P, alpha)
-        vector_solucion_python[i] = obtenerSolucionPython(M)
-        i+=1
-
-    return vector_solucion_python
-
-def obtenerComparacionesNumpy(P, alphas, x):
-    
-    normas = np.zeros(len(alphas))
-    i=0
-    for alpha in alphas:
-        M = modificarMatriz(P, alpha)
-        vector_solucion_python = obtenerSolucionPython(M)
-        normas[i] = residuoDosVectores(vector_solucion_python, x[i])
-        i+=1
-
-    return normas
-
-def obtenerComparacionesNumpySoluciones(x, soluciones):
-    normas = np.zeros(len(soluciones))
-    i=0
-    while i < len(soluciones):
-        normas[i] = residuoDosVectores(soluciones[i], x[i])
-        i+=1
-
-    return normas
-
 
 
 
@@ -172,8 +140,8 @@ if __name__ == "__main__":
 
     print("El tiempo de ejecución del PARALLEL POWER fue de: {:.5f} segundos".format(elapsed_time))
 
-    # soluciones = obtenerSolucionesNumpy(P, [alphas[49]])
-    # normas = obtenerComparacionesNumpySoluciones([x[49]], soluciones)
+    soluciones = obtenerSolucionesNumpy(P, [alphas[49]])
+    normas = obtenerComparacionesNumpySoluciones([x[49]], soluciones)
     
     # print("Solucion python", soluciones)
     # print("Vectores solución", x)
