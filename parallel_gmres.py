@@ -85,14 +85,13 @@ def parallel_gmres(P, v, m, alphas, tol, max_it, x_0):
     r_0 = np.zeros((s, N))
     res = np.zeros(s)
     gamma = np.zeros(s)
-    x = np.zeros((s, N))
+    x = x_0.copy()
     h = [np.zeros((m+1, m)) for _ in range(s)]
 
     for i in range(s):
         alpha_i = alphas[i]
         r_0[i] = np.dot((1-alpha_i)/alpha_i, v) - np.dot(np.eye(N)/alpha_i - P, x_0[i])
         res[i] = np.dot(alpha_i, np.linalg.norm(r_0[i], ord=2))
-
     mv = 0
     iter = 1
     numit = np.zeros(s)
@@ -103,10 +102,8 @@ def parallel_gmres(P, v, m, alphas, tol, max_it, x_0):
         for i in range(s):
             if i!=k: 
                 gamma[i] = res[i]*alphas[k]/(res[k]*alphas[i])
-
         r_0[k] = np.dot((1-alphas[k])/alphas[k], v) - np.dot(np.eye(N)/alphas[k] - P, x_0[k])
         x[k], y_k, res[k], h[k], V, betae1, suma = arnoldi_givens(np.eye(N)/alphas[k]-P, r_0[k], m, x_0[k], alphas[k]) 
-
         mv = mv+suma
         if res[k]<tol: numit[k] = mv
 
@@ -131,25 +128,24 @@ def parallel_gmres(P, v, m, alphas, tol, max_it, x_0):
                 else:
                     if(numit[i]==0): numit[i] = mv
 
-
         x_0 = x.copy()
 
         iter += 1
     
-    return x, res, mv, numit
+    return x_0, res, mv, numit
 
 if __name__ == "__main__":
 
-    # P = read_data_cz1268("./datos/cz1268.mtx")
-    # # P = read_data("./datos/minnesota2642.mtx")
-    # # P = read_data("./datos/hollins6012.mtx")
-    # # P = read_data("./datos/stanford9914.mtx")
-    # P = arreglarNodosColgantes(P)
+    P = read_data_cz1268("./datos/cz1268.mtx")
+    # P = read_data("./datos/minnesota2642.mtx")
+    # P = read_data("./datos/hollins6012.mtx")
+    # P = read_data("./datos/stanford9914.mtx")
+    P = arreglarNodosColgantes(P)
 
-    P = np.array([[1/2, 1/3, 0, 0],
-            [0, 1/3, 0, 1],
-            [0, 1/3, 1/2, 0],
-            [1/2, 0, 1/2, 0]])
+    # P = np.array([[1/2, 1/3, 0, 0],
+    #         [0, 1/3, 0, 1],
+    #         [0, 1/3, 1/2, 0],
+    #         [1/2, 0, 1/2, 0]])
 
     N = len(P)
 
@@ -158,9 +154,9 @@ if __name__ == "__main__":
     alphas = np.zeros(50)
     for i in range(0,50):
         alphas[i] = (i+50)*0.01
-    # alphas= np.array([0.85])
+    # alphas= np.array([0.99])
     tol = 1e-4
-    max_it = 1000
+    max_it = 100000
     x_0_1 = np.zeros(N)
 
     x_0 = np.tile(x_0_1, (len(alphas), 1))

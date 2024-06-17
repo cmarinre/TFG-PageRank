@@ -2,11 +2,11 @@ import copy
 import time
 
 import numpy as np
-from power_method_adaptive import (adaptive_power_method,
-                                   adaptive_power_method_k)
 
 from funciones_comunes import arreglarNodosColgantes, modificarMatriz
-from listos.power_method import power_method, power_method_convergence
+from power_method import power_method, power_method_convergence
+from power_method_adaptive import (adaptive_power_method,
+                                   adaptive_power_method_k)
 from read_data import read_data
 
 
@@ -82,15 +82,11 @@ def ejecucionPowerEstandar(A, x_0, max_it, tol):
 if __name__ == "__main__":
 
     # P = read_data("./datos/minnesota2642.mtx")
-    # P = arreglarNodosColgantes(P)
-    # M = modificarMatriz(A, 0.85)
+    # P = read_data("./datos/hollins6012.mtx")
+    P = read_data("./datos/stanford9914.mtx")
+    P = arreglarNodosColgantes(P)
 
 
-    P = np.array([[1/2, 1/3, 0, 0],
-                  [0, 1/3, 0, 1],
-                  [0, 1/3, 1/2, 0],
-                  [1/2, 0, 1/2, 0]])
-    
     M = modificarMatriz(P, 0.85)
 
 
@@ -100,8 +96,8 @@ if __name__ == "__main__":
     
     comparacionPowersMult(copy.deepcopy(M), copy.deepcopy(x_0), 5000, 1e-8)
 
-    ejecucionPowersAdaptiveK(copy.deepcopy(M), copy.deepcopy(x_0), 5000, 1e-8, 8)
+    # ejecucionPowersAdaptiveK(copy.deepcopy(M), copy.deepcopy(x_0), 5000, 1e-8, 8)
 
-    ejecucionPowerEstandar(copy.deepcopy(M), copy.deepcopy(x_0), 5000, 1e-8)
+    # ejecucionPowerEstandar(copy.deepcopy(M), copy.deepcopy(x_0), 5000, 1e-8)
 
     

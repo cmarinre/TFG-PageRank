@@ -1,5 +1,7 @@
 import numpy as np
 
+from read_data import read_data, read_data_cz1268
+
 
 # Función para la generación de una matriz dado un tamaño, que se parezca a una matriz de enlaces.
 # Intentamos establecer el número de enlaces salientes de cada página y ponerlos aleatoriamente en páginas distintas.
@@ -147,7 +149,7 @@ def residuoDosVectores(x1, x2):
     if(x1[0]<0): x1 = np.dot(-1, x1)
     if(x2[0]<0): x2 = np.dot(-1, x2)
     resta = x1-x2
-    diferencia = np.linalg.norm(resta, ord=1)
+    diferencia = np.linalg.norm(resta, ord=2)
 
     return diferencia
 
@@ -159,3 +161,29 @@ def guardar_diferencias_txt(diferencias, filename):
             diferencia_str = str(diferencia).replace('.', ',')
             f.write(f"{tiempo_str};{diferencia_str}\n")
 
+def comprobarVectorNumpy():
+    P = read_data("./datos/minnesota2642.mtx")
+    # P = read_data("./datos/hollins6012.mtx")
+    # P = read_data("./datos/stanford9914.mtx")
+    P = arreglarNodosColgantes(P)
+    M = modificarMatriz(P, 0.85)
+    vector_propio = obtenerSolucionPython(M)
+    vector_propio = vector_propio / np.linalg.norm(vector_propio, ord=1)
+    x_2 = np.dot(M, vector_propio)
+    x_2 = x_2 / np.linalg.norm(x_2, ord=1)
+    dif = residuoDosVectores(vector_propio, x_2)
+    print("Diferencia", dif)
+
+def calcularNumCond():
+    # P = read_data("./datos/minnesota2642.mtx")
+    # P = read_data("./datos/hollins6012.mtx")
+    # P = read_data("./datos/stanford9914.mtx")
+    P = read_data_cz1268("./datos/cz1268.mtx")
+
+    # Calcular el número de condición
+    cond_number = np.linalg.cond(P)
+    print("Número de condición:", cond_number)
+
+
+if __name__ == "__main__":
+    calcularNumCond()

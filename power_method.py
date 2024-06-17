@@ -6,7 +6,8 @@ import numpy as np
 from funciones_comunes import (arreglarNodosColgantes, modificarMatriz,
                                multiplicacionMatrizVector,
                                obtenerSolucionPython, residuoDosVectores)
-from read_data import read_data
+from read_data import (read_data, read_data_cz1268, read_data_hollins,
+                       read_data_minnesota)
 
 
 # Método de las potencias estándar, calculando la convergencia con la norma 1
@@ -71,9 +72,10 @@ def obtenerComparacionesNumpy(M, x):
 
 if __name__ == "__main__":
 
-    # P = read_data("./datos/minnesota2642.mtx")
-    # P = read_data("./datos/hollins6012.mtx")
-    P = read_data("./datos/stanford9914.mtx")
+    # P = read_data_cz1268("./datos/cz1268.mtx")
+    # P = read_data_minnesota("./datos/minnesota2642.mtx")
+    P = read_data_hollins("./datos/hollins6012.mtx")
+    # P = read_data_hollins("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
 
     # P = np.array([[1/2, 1/3, 0, 0],
@@ -81,7 +83,7 @@ if __name__ == "__main__":
     #               [0, 1/3, 1/2, 0],
     #               [1/2, 0, 1/2, 0]])
     
-    alpha = 0.99
+    alpha = 0.95
     M = modificarMatriz(P, alpha)
 
     N = len(M)
@@ -104,3 +106,6 @@ if __name__ == "__main__":
     # print("Norma residual", norma)
     # print("Vector solución", eigenvector1)
 
+    siguiente = np.dot(M, eigenvector1)
+    diferencia = residuoDosVectores(eigenvector1, siguiente/np.linalg.norm(siguiente, ord=1))
+    print("diferencia", diferencia)

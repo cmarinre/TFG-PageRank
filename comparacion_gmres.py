@@ -46,16 +46,16 @@ def comparacion_gmres(A, x_0, alpha, max_it, tol, m1, m2, m3):
 
     # print("comienza GMRES 2")
 
-    start_time_rei = time.time()
-    x_n_rei, iteraciones_rei = GMRESReiniciado(copy.deepcopy(Matriz), copy.deepcopy(b), copy.deepcopy(x_0), tol, m1, max_it)
-    end_time_rei = time.time()
-    elapsed_time_rei = end_time_rei - start_time_rei
+    # start_time_rei = time.time()
+    # x_n_rei, iteraciones_rei = GMRESReiniciado(copy.deepcopy(Matriz), copy.deepcopy(b), copy.deepcopy(x_0), tol, m1, max_it)
+    # end_time_rei = time.time()
+    # elapsed_time_rei = end_time_rei - start_time_rei
 
-    print("El tiempo de ejecución de GMRES reiniciado 2 fue de: {:.5f} segundos".format(elapsed_time_rei).replace('.', ','))
-    # print("{:.5f}".format(elapsed_time_rei).replace('.', ','))
+    # print("El tiempo de ejecución de GMRES reiniciado 2 fue de: {:.5f} segundos".format(elapsed_time_rei).replace('.', ','))
+    # # print("{:.5f}".format(elapsed_time_rei).replace('.', ','))
 
-    # print("Vector solución", x_n_rei)
-    # print("Número de iteraciones:", iteraciones_rei)
+    # # print("Vector solución", x_n_rei)
+    # # print("Número de iteraciones:", iteraciones_rei)
 
 
     # # print("comienza GMRES 5")
@@ -72,34 +72,34 @@ def comparacion_gmres(A, x_0, alpha, max_it, tol, m1, m2, m3):
     # # print("Número de iteraciones:", iteraciones_rei)
 
 
-    # # print("comienza GMRES 8")
+    # print("comienza GMRES 8")
 
-    # start_time_rei = time.time()
-    # x_n_rei3, iteraciones_rei = GMRESReiniciado(copy.deepcopy(Matriz), copy.deepcopy(b), copy.deepcopy(x_0), tol, m3, max_it)
-    # end_time_rei = time.time()
-    # elapsed_time_rei = end_time_rei - start_time_rei
+    start_time_rei = time.time()
+    x_n_rei3, iteraciones_rei = GMRESReiniciado(copy.deepcopy(Matriz), copy.deepcopy(b), copy.deepcopy(x_0), tol, m3, max_it)
+    end_time_rei = time.time()
+    elapsed_time_rei = end_time_rei - start_time_rei
 
-    # # print("El tiempo de ejecución de GMRES reiniciado 8 fue de: {:.5f} segundos".format(elapsed_time_rei).replace('.', ','))
-    # print("{:.5f}".format(elapsed_time_rei).replace('.', ','))
-    # # print("Vector solución", x_n_rei3)
-    # # print("Número de iteraciones:", iteraciones_rei)
+    # print("El tiempo de ejecución de GMRES reiniciado 8 fue de: {:.5f} segundos".format(elapsed_time_rei).replace('.', ','))
+    print("{:.5f}".format(elapsed_time_rei).replace('.', ','))
+    # print("Vector solución", x_n_rei3)
+    # print("Número de iteraciones:", iteraciones_rei)
 
-    return x_n_rei
+    return x_n_rei3
 # x_n, x_n_rei, x_n_rei2, x_n_rei3
 
 
 
 if __name__ == "__main__":
 
-    # # P = read_data("./datos/minnesota2642.mtx")
+    P = read_data("./datos/minnesota2642.mtx")
     # P = read_data("./datos/hollins6012.mtx")
-    # # P = read_data("./datos/stanford9914.mtx")
-    # P = arreglarNodosColgantes(P)
+    # P = read_data("./datos/stanford9914.mtx")
+    P = arreglarNodosColgantes(P)
 
-    P = np.array([[1/2, 1/3, 0, 0],
-                  [0, 1/3, 0, 1],
-                  [0, 1/3, 1/2, 0],
-                  [1/2, 0, 1/2, 0]])
+    # P = np.array([[1/2, 1/3, 0, 0],
+    #               [0, 1/3, 0, 1],
+    #               [0, 1/3, 1/2, 0],
+    #               [1/2, 0, 1/2, 0]])
 
     alpha = 0.85
 

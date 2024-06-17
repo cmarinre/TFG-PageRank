@@ -7,7 +7,7 @@ from funciones_comunes import (arreglarNodosColgantes, modificarMatriz,
                                obtenerComparacionesNumpySoluciones,
                                obtenerSolucionesNumpy, obtenerSolucionPython,
                                residuoDosVectores)
-from read_data import read_data
+from read_data import read_data, read_data_cz1268
 
 
 def paraller_power_modified(P, vector, max_mv, tolerance, alphas):
@@ -113,9 +113,10 @@ def paraller_power_modified_MedicionNumIt(P, vector, max_mv, tolerance, alphas):
 
 if __name__ == "__main__":
 
+    P = read_data_cz1268("./datos/cz1268.mtx")
     # P = read_data("./datos/minnesota2642.mtx")
     # P = read_data("./datos/hollins6012.mtx")
-    P = read_data("./datos/stanford9914.mtx")
+    # P = read_data("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
 
     # P = np.array([[1/2, 1/3, 0, 0],
@@ -126,7 +127,7 @@ if __name__ == "__main__":
     N = len(P)
     v = np.ones(N)/N
     tol=1e-6
-    max_it = 100000
+    max_it = 10000
 
     alphas = np.zeros(50)
     for i in range(0,50):
@@ -149,7 +150,7 @@ if __name__ == "__main__":
     print("Número de iteraciones", num_it_total)
     print("Número de iteraciones", num_it)
 
-    # print("Residuo", res)
-    # print("Norma residual", normas)
+    print("Residuo", res)
+    print("Norma residual", normas)
 
 

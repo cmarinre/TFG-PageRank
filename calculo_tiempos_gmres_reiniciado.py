@@ -113,7 +113,6 @@ def GMRESReiniciado(A, b, x_0, tol, m, max_it, vector_solucion_python):
     thread.daemon = True
     thread.start()
 
-    print(x_0)
     conver = 1
     it=0
     while conver>tol and it<max_it:
@@ -130,9 +129,9 @@ def GMRESReiniciado(A, b, x_0, tol, m, max_it, vector_solucion_python):
 
 if __name__ == "__main__":
 
-    P = read_data_cz1268("./datos/cz1268.mtx")
+    # P = read_data_cz1268("./datos/cz1268.mtx")
     # P = read_data("./datos/minnesota2642.mtx")
-    # P = read_data("./datos/hollins6012.mtx")
+    P = read_data("./datos/hollins6012.mtx")
     # P = read_data("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
 
@@ -163,7 +162,7 @@ if __name__ == "__main__":
     x_0 = np.ones(N)/N
 
 
-    tol = 1e-10
+    tol = 1e-5
     m=3
     max_it = 10000
 

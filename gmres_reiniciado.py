@@ -3,8 +3,10 @@ import time
 
 import numpy as np
 
-from funciones_comunes import arreglarNodosColgantes, matrizPageRank
-from read_data import read_data
+from funciones_comunes import (arreglarNodosColgantes, matrizPageRank,
+                               modificarMatriz, residuoDosVectores)
+from read_data import (read_data, read_data_cz1268, read_data_hollins,
+                       read_data_minnesota)
 
 
 def GMRES_m(A, b, x_0, m, tol):
@@ -37,7 +39,6 @@ def GMRES_m(A, b, x_0, m, tol):
     
     n=0
     while n<=(m-1):
-
         t = np.dot(A, V[:,n])
         
         # Arnoldi
@@ -106,9 +107,10 @@ def GMRESReiniciado(A, b, x_0, tol, m, max_it):
 
 if __name__ == "__main__":
 
-    P = read_data("./datos/minnesota2642.mtx")
-    # P = read_data("./datos/hollins6012.mtx")
-    # P = read_data("./datos/stanford9914.mtx")
+    # P = read_data_cz1268("./datos/cz1268.mtx")
+    # P = read_data_minnesota("./datos/minnesota2642.mtx")
+    P = read_data_hollins("./datos/hollins6012.mtx")
+    # P = read_data_hollins("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
 
     # P = np.array([[1/2, 1/3, 0, 0],
@@ -117,7 +119,7 @@ if __name__ == "__main__":
     #         [1/2, 0, 1/2, 0]])
 
 
-    alpha = 0.99
+    alpha = 0.95
     N = len(P)
 
     # Primero formateamos nuestro problema a la forma Ax=b
@@ -137,7 +139,7 @@ if __name__ == "__main__":
     x_0 = np.ones(N)/N
 
     start_time = time.time()
-    x_n, n = GMRESReiniciado(A, b, x_0, 1e-4, 2, 1000)
+    x_n, n = GMRESReiniciado(A, b, x_0, 1e-8, 2, 1000)
     end_time = time.time()
     elapsed_time = end_time - start_time
 
@@ -146,4 +148,10 @@ if __name__ == "__main__":
     
     x_n_norm = x_n / np.linalg.norm(np.array(x_n), ord=1)
     print("Vector solución normalizado", x_n_norm)
+    print("num it", n)
+
+
+    siguiente = np.dot(modificarMatriz(P, alpha), x_n)
+    diferencia = residuoDosVectores(x_n, siguiente/np.linalg.norm(siguiente, ord=1))
+    print("diferencia", diferencia)
 
