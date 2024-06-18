@@ -6,7 +6,7 @@ import numpy as np
 from funciones_comunes import (arreglarNodosColgantes, guardar_diferencias_txt,
                                modificarMatriz, obtenerSolucionPython,
                                residuoDosVectores)
-from read_data import read_data, read_data_cz1268, read_data_minnesota
+from read_data import read_data, read_data_minnesota
 
 
 # Implementación del método de las potencias estándar incluyendo un hilo para medir las diferencias

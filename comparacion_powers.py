@@ -97,29 +97,29 @@ if __name__ == "__main__":
 
     x_0 = np.ones(N)/N
 
-    tol = 1e-4
+    # tol = 1e-4
 
     #Descomentamos los que necesitemos en cada momento
     
-    comparacionPowersMult(copy.deepcopy(M), copy.deepcopy(x_0), 5000, tol)
+    # comparacionPowersMult(copy.deepcopy(M), copy.deepcopy(x_0), 5000, tol)
 
-    ejecucionPowersAdaptiveK(copy.deepcopy(M), copy.deepcopy(x_0), 5000, tol, 8)
+    # ejecucionPowersAdaptiveK(copy.deepcopy(M), copy.deepcopy(x_0), 5000, tol, 8)
 
     # ejecucionPowerEstandar(copy.deepcopy(M), copy.deepcopy(x_0), 5000, tol)
 
 
-    tol = 1e-6
+    # tol = 1e-6
 
-    comparacionPowersMult(copy.deepcopy(M), copy.deepcopy(x_0), 5000, tol)
+    # comparacionPowersMult(copy.deepcopy(M), copy.deepcopy(x_0), 5000, tol)
 
-    ejecucionPowersAdaptiveK(copy.deepcopy(M), copy.deepcopy(x_0), 5000, tol, 8)
+    # ejecucionPowersAdaptiveK(copy.deepcopy(M), copy.deepcopy(x_0), 5000, tol, 8)
 
     # ejecucionPowerEstandar(copy.deepcopy(M), copy.deepcopy(x_0), 5000, tol)
 
 
     tol = 1e-8
 
-    comparacionPowersMult(copy.deepcopy(M), copy.deepcopy(x_0), 5000, tol)
+    # comparacionPowersMult(copy.deepcopy(M), copy.deepcopy(x_0), 5000, tol)
 
     ejecucionPowersAdaptiveK(copy.deepcopy(M), copy.deepcopy(x_0), 5000, tol, 8)
 

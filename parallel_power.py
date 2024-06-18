@@ -8,7 +8,7 @@ from funciones_comunes import (arreglarNodosColgantes, guardar_numit,
                                obtenerComparacionesNumpySoluciones,
                                obtenerSolucionesNumpy, obtenerSolucionPython,
                                residuoDosVectores)
-from read_data import read_data, read_data_cz1268, read_data_minnesota
+from read_data import read_data, read_data_minnesota
 
 
 # Función que paraleliza la ejecución del método de las potencias para distintos alphas

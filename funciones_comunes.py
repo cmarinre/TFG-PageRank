@@ -1,6 +1,6 @@
 import numpy as np
 
-from read_data import read_data, read_data_cz1268
+from read_data import read_data
 
 
 # Función para la generación de una matriz dado un tamaño, que se parezca a una matriz de enlaces.

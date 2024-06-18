@@ -7,7 +7,7 @@ from funciones_comunes import (arreglarNodosColgantes, guardar_numit,
                                modificarMatriz,
                                obtenerComparacionesNumpySoluciones,
                                obtenerSolucionesNumpy, residuoDosVectores)
-from read_data import read_data, read_data_cz1268, read_data_minnesota
+from read_data import read_data, read_data_minnesota
 
 
 def arnoldi_givens(A, r_0, m, x_0, alpha):

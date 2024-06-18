@@ -6,7 +6,7 @@ import numpy as np
 from funciones_comunes import (arreglarNodosColgantes, modificarMatriz,
                                multiplicacionMatrizVector,
                                obtenerSolucionPython, residuoDosVectores)
-from read_data import read_data, read_data_cz1268, read_data_minnesota
+from read_data import read_data, read_data_minnesota
 
 
 # Método de las potencias estándar, calculando la convergencia con la norma 1
