@@ -3,10 +3,11 @@ import time
 
 import numpy as np
 
-from funciones_comunes import (arreglarNodosColgantes,
+from funciones_comunes import (arreglarNodosColgantes, guardar_numit,
+                               modificarMatriz,
                                obtenerComparacionesNumpySoluciones,
-                               obtenerSolucionesNumpy)
-from read_data import read_data, read_data_cz1268
+                               obtenerSolucionesNumpy, residuoDosVectores)
+from read_data import read_data, read_data_cz1268, read_data_minnesota
 
 
 def arnoldi_givens(A, r_0, m, x_0, alpha):
@@ -77,7 +78,7 @@ def apply_givens_rotation(h, c, s, k, i):
 
 
 
-
+# Función que paraleliza la ejecución del método GMRES para distintos alphas
 def parallel_gmres(P, v, m, alphas, tol, max_it, x_0):
     N = len(P)
     s = len(alphas)
@@ -97,7 +98,6 @@ def parallel_gmres(P, v, m, alphas, tol, max_it, x_0):
     numit = np.zeros(s)
 
     while max(res)>=tol and iter <= max_it :
-
         k = np.argmax(res)
         for i in range(s):
             if i!=k: 
@@ -110,7 +110,7 @@ def parallel_gmres(P, v, m, alphas, tol, max_it, x_0):
         for i in range(s):
             if i!=k:
                 if res[i] >= tol:
-                    
+
                     h[i] = h[k][:(m),:(m)] + np.dot( (1-alphas[i])/alphas[i] - (1-alphas[k])/alphas[k] , np.eye(m))
                     
                     z = betae1[:(m)] - np.dot(h[k][:(m),:(m)], y_k)
@@ -124,7 +124,8 @@ def parallel_gmres(P, v, m, alphas, tol, max_it, x_0):
                     x[i] = x_0[i] + np.dot(V[:,:(m)], y_i)
                     x[i] = x[i] / np.linalg.norm(x[i], ord=1)
                     # res[i] = alphas[i]/alphas[k]*gamma[i]*res[k]
-                    res[i] = alphas[k]*np.linalg.norm((1 - alphas[i]) / alphas[i] * v - (np.eye(N) / alphas[i] - P).dot(x[i]), ord=2) # CON LA QUE NOS FUNCIONA XD
+                    res[i] = alphas[k]*np.linalg.norm((1 - alphas[i]) / alphas[i] * v - (np.eye(N) / alphas[i] - P).dot(x[i]), ord=2) 
+                    if(res[i]<tol): numit[i] = mv
                 else:
                     if(numit[i]==0): numit[i] = mv
 
@@ -136,9 +137,8 @@ def parallel_gmres(P, v, m, alphas, tol, max_it, x_0):
 
 if __name__ == "__main__":
 
-    P = read_data_cz1268("./datos/cz1268.mtx")
-    # P = read_data("./datos/minnesota2642.mtx")
-    # P = read_data("./datos/hollins6012.mtx")
+    # P = read_data_minnesota("./datos/minnesota2642.mtx")
+    P = read_data("./datos/hollins6012.mtx")
     # P = read_data("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
 
@@ -154,9 +154,9 @@ if __name__ == "__main__":
     alphas = np.zeros(50)
     for i in range(0,50):
         alphas[i] = (i+50)*0.01
-    # alphas= np.array([0.99])
+
     tol = 1e-4
-    max_it = 100000
+    max_it = 10000
     x_0_1 = np.zeros(N)
 
     x_0 = np.tile(x_0_1, (len(alphas), 1))
@@ -168,18 +168,11 @@ if __name__ == "__main__":
     elapsed_time = end_time - start_time
 
     print("El tiempo de ejecución del PARALLEL gmres fue de: {:.5f} segundos".format(elapsed_time))
-
-    soluciones = obtenerSolucionesNumpy(P, alphas)
-    normas = obtenerComparacionesNumpySoluciones(x, soluciones)
     
-    # print("Solucion python", soluciones)
-    # print("Vectores solución", x)
+    print("Vectores solución", x)
 
     print("Número de iteraciones", mv)
-    print("Número de iteraciones", numit)
+    guardar_numit(numit, "numit.txt")
 
     print("Residuo", res)
-    print("Norma residual", normas)
-
-
 

@@ -3,13 +3,15 @@ import time
 
 import numpy as np
 
-from funciones_comunes import (arreglarNodosColgantes, modificarMatriz,
+from funciones_comunes import (arreglarNodosColgantes, guardar_numit,
+                               modificarMatriz,
                                obtenerComparacionesNumpySoluciones,
                                obtenerSolucionesNumpy, obtenerSolucionPython,
                                residuoDosVectores)
-from read_data import read_data, read_data_cz1268
+from read_data import read_data, read_data_cz1268, read_data_minnesota
 
 
+# Función que paraleliza la ejecución del método de las potencias para distintos alphas
 def paraller_power_modified(P, vector, max_mv, tolerance, alphas):
     # Obtenemos la dimensión de la matriz y el número de alphas que tenemos
     N = len(P)
@@ -32,14 +34,10 @@ def paraller_power_modified(P, vector, max_mv, tolerance, alphas):
     for i in range(s):
         r[i] = np.dot(alphas[i],u)
         res[i] = np.linalg.norm(r[i], ord=1)
-        print("r", r)
 
         if res[i] >= tolerance:
             x[i] = r[i] + v
-            print("x", x)
 
-
-    print("WHILE")
 
     while max(res) >= tolerance and mv <= max_mv:
         u = np.dot(P,u)
@@ -59,7 +57,7 @@ def paraller_power_modified(P, vector, max_mv, tolerance, alphas):
     return x, num_it, res, mv
 
 
-
+# Función que paraleliza la ejecución del método de las potencias para distintos alphas que mide el número de iteraciones
 def paraller_power_modified_MedicionNumIt(P, vector, max_mv, tolerance, alphas):
     # Obtenemos la dimensión de la matriz y el número de alphas que tenemos
     N = len(P)
@@ -113,20 +111,15 @@ def paraller_power_modified_MedicionNumIt(P, vector, max_mv, tolerance, alphas):
 
 if __name__ == "__main__":
 
-    P = read_data_cz1268("./datos/cz1268.mtx")
-    # P = read_data("./datos/minnesota2642.mtx")
+    # P = read_data_minnesota("./datos/minnesota2642.mtx")
     # P = read_data("./datos/hollins6012.mtx")
-    # P = read_data("./datos/stanford9914.mtx")
+    P = read_data("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
 
-    # P = np.array([[1/2, 1/3, 0, 0],
-    #               [0, 1/3, 0, 1],
-    #               [0, 1/3, 1/2, 0],
-    #               [1/2, 0, 1/2, 0]])
     
     N = len(P)
     v = np.ones(N)/N
-    tol=1e-6
+    tol=1e-8
     max_it = 10000
 
     alphas = np.zeros(50)
@@ -141,16 +134,10 @@ if __name__ == "__main__":
 
     print("El tiempo de ejecución del PARALLEL POWER fue de: {:.5f} segundos".format(elapsed_time))
 
-    soluciones = obtenerSolucionesNumpy(P, [alphas[49]])
-    normas = obtenerComparacionesNumpySoluciones([x[49]], soluciones)
-    
-    # print("Solucion python", soluciones)
-    # print("Vectores solución", x)
 
     print("Número de iteraciones", num_it_total)
     print("Número de iteraciones", num_it)
+    guardar_numit(num_it, "numit.txt")
 
     print("Residuo", res)
-    print("Norma residual", normas)
-
 

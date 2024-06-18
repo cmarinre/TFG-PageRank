@@ -5,10 +5,10 @@ import numpy as np
 
 from funciones_comunes import (arreglarNodosColgantes, matrizPageRank,
                                modificarMatriz, residuoDosVectores)
-from read_data import (read_data, read_data_cz1268, read_data_hollins,
-                       read_data_minnesota)
+from read_data import read_data, read_data_cz1268, read_data_minnesota
 
 
+# Implementación del método GMRES(m)
 def GMRES_m(A, b, x_0, m, tol):
 
     N = len(A)
@@ -98,7 +98,6 @@ def GMRESReiniciado(A, b, x_0, tol, m, max_it):
         x_0 = x_n
         it+=1
 
-
     x_n = x_n / np.linalg.norm(x_n, ord=1)
     return x_n, m*it
 
@@ -107,19 +106,13 @@ def GMRESReiniciado(A, b, x_0, tol, m, max_it):
 
 if __name__ == "__main__":
 
-    # P = read_data_cz1268("./datos/cz1268.mtx")
-    # P = read_data_minnesota("./datos/minnesota2642.mtx")
-    P = read_data_hollins("./datos/hollins6012.mtx")
-    # P = read_data_hollins("./datos/stanford9914.mtx")
+    P = read_data_minnesota("./datos/minnesota2642.mtx")
+    # P = read_data("./datos/hollins6012.mtx")
+    # P = read_data("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
 
-    # P = np.array([[1/2, 1/3, 0, 0],
-    #         [0, 1/3, 0, 1],
-    #         [0, 1/3, 1/2, 0],
-    #         [1/2, 0, 1/2, 0]])
 
-
-    alpha = 0.95
+    alpha = 0.99
     N = len(P)
 
     # Primero formateamos nuestro problema a la forma Ax=b
@@ -133,13 +126,12 @@ if __name__ == "__main__":
     A = np.eye(N) - np.array(np.dot(alpha, P))
 
     # Necesitamos un vector inicial x_0
-    # x_0 = np.random.rand(N)
-    # x_0 = x_0 / np.linalg.norm(np.array(x_0), ord=1)
-
     x_0 = np.ones(N)/N
 
+    tol = 1e-4
+
     start_time = time.time()
-    x_n, n = GMRESReiniciado(A, b, x_0, 1e-8, 2, 1000)
+    x_n, n = GMRESReiniciado(A, b, x_0, tol, 2, 1000)
     end_time = time.time()
     elapsed_time = end_time - start_time
 
@@ -150,7 +142,7 @@ if __name__ == "__main__":
     print("Vector solución normalizado", x_n_norm)
     print("num it", n)
 
-
+    # Comparamos la fiabilidad de la solución.
     siguiente = np.dot(modificarMatriz(P, alpha), x_n)
     diferencia = residuoDosVectores(x_n, siguiente/np.linalg.norm(siguiente, ord=1))
     print("diferencia", diferencia)

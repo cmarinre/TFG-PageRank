@@ -6,14 +6,13 @@ import numpy as np
 from funciones_comunes import (arreglarNodosColgantes, modificarMatriz,
                                obtenerSolucionPython, residuoDosVectores)
 from gmres_reiniciado import GMRES_m
-from read_data import (read_data, read_data_cz1268, read_data_hollins,
-                       read_data_minnesota)
+from read_data import read_data, read_data_cz1268, read_data_minnesota
 
 
+# Implementación del método POWER-GMRES(m)
 def power_gmres(P, b, alpha, x, max_it, tol, alpha_1, m):
     A = np.eye(len(P)) - np.array(np.dot(alpha, P))
     terminado = False
-    # conver = tol+1
     while terminado==False:     
         r=1
         for i in range(0,2):
@@ -49,12 +48,10 @@ def power_gmres(P, b, alpha, x, max_it, tol, alpha_1, m):
 
 if __name__ == "__main__":
 
-    # P = read_data_cz1268("./datos/cz1268.mtx")
     # P = read_data_minnesota("./datos/minnesota2642.mtx")
-    P = read_data_hollins("./datos/hollins6012.mtx")
-    # P = read_data_hollins("./datos/stanford9914.mtx")
+    P = read_data("./datos/hollins6012.mtx")
+    # P = read_data("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
-
 
     alpha = 0.95
 
@@ -70,11 +67,7 @@ if __name__ == "__main__":
     b = np.dot(1-alpha, v)
 
     # Necesitamos un vector inicial x_0
-    # x_0 = np.random.rand(N)
-    # x_0 = x_0 / np.linalg.norm(np.array(x_0), ord=1)
-
     x_0 = np.ones(N)/N
-
 
     tol = 1e-8
     m = 2
@@ -89,7 +82,6 @@ if __name__ == "__main__":
 
     print("El tiempo de ejecución de POWER- GMRES fue de: {:.5f} segundos".format(elapsed_time))
     print("Vector solución normalizado", x_n)
-
 
     diferencia = residuoDosVectores(x_n, np.dot(M, x_n))
     print("diferencia", diferencia)

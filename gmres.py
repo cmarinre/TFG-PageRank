@@ -4,6 +4,7 @@ import time
 import numpy as np
 
 
+# Implementación del método GMRES básico
 def GMRES(A, b, x_0, max_it, tol):
 
     N = len(A)
@@ -11,11 +12,9 @@ def GMRES(A, b, x_0, max_it, tol):
     # Creamos el vec r_0, que es b-Ax_0
     r_0 = b - np.dot(A, x_0)
     
-
     # Generamos una matriz V y una h con todos sus valores a 0
     V = np.zeros((N, max_it+1))
     h = np.zeros((max_it+1, max_it))
-
 
     # Establecemos el v_1 al vector inicial normalizado.
     r_0_norm = np.linalg.norm(r_0, ord=2)

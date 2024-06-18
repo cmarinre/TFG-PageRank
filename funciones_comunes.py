@@ -83,6 +83,7 @@ def modificarMatriz(A, alpha):
     M = np.dot(alpha, A) + np.dot((1-alpha), S)
     return M
 
+# Función que dada una matriz introduce un nodo hipotético al que apuntan los nodos que no tengan enlaces salientes.
 def arreglarNodosColgantes(A):
     n = len(A)
     nueva_matriz = np.zeros((n+1, n+1))  # Crear una matriz de (n+1)x(n+1) llena de ceros
@@ -98,7 +99,7 @@ def arreglarNodosColgantes(A):
 
     return nueva_matriz
 
-
+# Función para obtener la solución dada por Python de una matriz
 def obtenerSolucionPython(A):
     eigenvalues, eigenvectors = np.linalg.eig(A)
 
@@ -110,6 +111,7 @@ def obtenerSolucionPython(A):
     eigenvector = eigenvector / np.linalg.norm(eigenvector, ord=1)
     return eigenvector
 
+# Función para obtener la solución dada por Python de una matriz con diferentes alphas
 def obtenerSolucionesNumpy(P, alphas):
     
     vector_solucion_python = np.zeros((len(alphas), len(P)))
@@ -121,7 +123,7 @@ def obtenerSolucionesNumpy(P, alphas):
 
     return vector_solucion_python
 
-
+# Función para obtener las diferencias entre nuestras soluciones y las soluciones de NumPy
 def obtenerComparacionesNumpySoluciones(x, soluciones):
     normas = np.zeros(len(soluciones))
     i=0
@@ -131,6 +133,8 @@ def obtenerComparacionesNumpySoluciones(x, soluciones):
 
     return normas
 
+# Función que obtiene las soluciones de NumPy y las diferencias entre nuestras 
+# soluciones y las soluciones de NumPy para distintos alphas
 def obtenerComparacionesNumpy(P, alphas, x):
     
     normas = np.zeros(len(alphas))
@@ -138,22 +142,22 @@ def obtenerComparacionesNumpy(P, alphas, x):
     for alpha in alphas:
         M = modificarMatriz(P, alpha)
         vector_solucion_python = obtenerSolucionPython(M)
-        print("vector python", vector_solucion_python)
         normas[i] = residuoDosVectores(vector_solucion_python, x[i])
         i+=1
 
     return normas
 
+# Función para calcular la diferencia en norma 1 de dos vectores (positivos)
 def residuoDosVectores(x1, x2):
 
     if(x1[0]<0): x1 = np.dot(-1, x1)
     if(x2[0]<0): x2 = np.dot(-1, x2)
     resta = x1-x2
-    diferencia = np.linalg.norm(resta, ord=2)
+    diferencia = np.linalg.norm(resta, ord=1)
 
     return diferencia
 
-
+# Función para guardar las diferencias con un formato compatible con excel
 def guardar_diferencias_txt(diferencias, filename):
     with open(filename, 'w') as f:
         for tiempo, diferencia in diferencias:
@@ -161,6 +165,8 @@ def guardar_diferencias_txt(diferencias, filename):
             diferencia_str = str(diferencia).replace('.', ',')
             f.write(f"{tiempo_str};{diferencia_str}\n")
 
+
+# Función para comprobar la fiabilidad de la solución dada por Numpy
 def comprobarVectorNumpy():
     P = read_data("./datos/minnesota2642.mtx")
     # P = read_data("./datos/hollins6012.mtx")
@@ -174,16 +180,10 @@ def comprobarVectorNumpy():
     dif = residuoDosVectores(vector_propio, x_2)
     print("Diferencia", dif)
 
-def calcularNumCond():
-    # P = read_data("./datos/minnesota2642.mtx")
-    # P = read_data("./datos/hollins6012.mtx")
-    # P = read_data("./datos/stanford9914.mtx")
-    P = read_data_cz1268("./datos/cz1268.mtx")
-
-    # Calcular el número de condición
-    cond_number = np.linalg.cond(P)
-    print("Número de condición:", cond_number)
-
-
-if __name__ == "__main__":
-    calcularNumCond()
+# Función para guardar el número de iteraciones con un formato compatible con excel
+def guardar_numit(numit, filename):
+    with open(filename, 'w') as f:
+        numitstring = ""
+        for num in numit:
+            numitstring += str(num).replace('.0', '') + ','
+        f.write(f"{numitstring}")

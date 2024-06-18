@@ -6,16 +6,17 @@ import numpy as np
 from funciones_comunes import (arreglarNodosColgantes, guardar_diferencias_txt,
                                modificarMatriz, obtenerSolucionPython,
                                residuoDosVectores)
-from read_data import read_data, read_data_cz1268
+from read_data import read_data, read_data_cz1268, read_data_minnesota
 
-# Método de las potencias estándar al que le añadimos guardar cada x tiempo, la diferencia con el vector "óptimo" que buscamos
 
+# Implementación del método de las potencias estándar incluyendo un hilo para medir las diferencias
+# con el vector "óptimo" a lo largo del tiempo.
 def power_method(matrix, vector, max_iterations, tolerance, vector_solucion_python):
 
     diferencias = []
     tiempo_inicio = time.time()  # Guardamos el tiempo de inicio de la ejecución del método
     lock = threading.Lock()  # Crear un lock para manejar la sincronización entre hilos
-    intervalo_registro = 0.5  # Intervalo de tiempo en segundos entre registros
+    intervalo_registro = 0.4  # Intervalo de tiempo en segundos entre registros
     ultimo_registro = [time.time()]  # Usamos una lista para permitir modificación dentro del hilo
 
     def guardar_diferencia():
@@ -59,30 +60,22 @@ def power_method(matrix, vector, max_iterations, tolerance, vector_solucion_pyth
 
 if __name__ == "__main__":
 
-    # P = read_data_cz1268("./datos/cz1268.mtx")
-    # P = read_data("./datos/minnesota2642.mtx")
-    P = read_data("./datos/hollins6012.mtx")
-    # P = read_data("./datos/stanford9914.mtx")
+    # P = read_data_minnesota("./datos/minnesota2642.mtx")
+    # P = read_data("./datos/hollins6012.mtx")
+    P = read_data("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
 
 
-    # P = np.array([[1/2, 1/3, 0, 0],
-    #               [0, 1/3, 0, 1],
-    #               [0, 1/3, 1/2, 0],
-    #               [1/2, 0, 1/2, 0]])
-
-    alpha = 0.99
+    alpha = 0.999
 
     M = modificarMatriz(P, alpha)
 
+    # Necesitamos un vector inicial x_0
     N = len(P)
-    # x_0 = np.random.rand(N)
-    # x_0 = x_0 / np.linalg.norm(np.array(x_0), ord=1)
-
     x_0 = np.ones(N)/N
 
 
-    tol = 1e-5
+    tol = 1e-10
     max_it = 10000
 
     print("--------------- PYTHON --------------")
@@ -101,8 +94,9 @@ if __name__ == "__main__":
     end_time1 = time.time()
     elapsed_time1 = end_time1 - start_time1
 
-    # print("DIFERENCIAS", diferencias)
+    print("DIFERENCIAS", diferencias)
     print("TIEMPO", elapsed_time1)
-    # print("SOLUCION", x_n)
+    print("SOLUCION", x_n)
 
+    # Para coger los datos más fácilmente en el excel
     guardar_diferencias_txt(diferencias, "power.txt")

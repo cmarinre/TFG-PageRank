@@ -6,9 +6,11 @@ import numpy as np
 from funciones_comunes import (arreglarNodosColgantes, guardar_diferencias_txt,
                                modificarMatriz, obtenerSolucionPython,
                                residuoDosVectores)
-from read_data import read_data, read_data_cz1268
+from read_data import read_data, read_data_cz1268, read_data_minnesota
 
 
+# Implementación del método GMRES reiniciado incluyendo un hilo para medir las diferencias
+# con el vector "óptimo" a lo largo del tiempo.
 def GMRES_m(A, b, x_0, m, tol):
 
     N = len(A)
@@ -24,7 +26,6 @@ def GMRES_m(A, b, x_0, m, tol):
     
     # Establecemos el v_1 al vector inicial normalizado.
     r_0_norm = np.linalg.norm(r_0, ord=2)
-    # print("r_0_norm", r_0_norm)
     V[:, 0] = r_0 / r_0_norm
     
     # Inicializamos el vector g
@@ -96,7 +97,7 @@ def GMRESReiniciado(A, b, x_0, tol, m, max_it, vector_solucion_python):
     diferencias = []
     tiempo_inicio = time.time()  # Guardamos el tiempo de inicio de la ejecución del método
     lock = threading.Lock()  # Crear un lock para manejar la sincronización entre hilos
-    intervalo_registro = 0.5  # Intervalo de tiempo en segundos entre registros
+    intervalo_registro = 0.4  # Intervalo de tiempo en segundos entre registros
     ultimo_registro = [time.time()]  # Usamos una lista para permitir modificación dentro del hilo
 
     def guardar_diferencia():
@@ -129,23 +130,19 @@ def GMRESReiniciado(A, b, x_0, tol, m, max_it, vector_solucion_python):
 
 if __name__ == "__main__":
 
-    # P = read_data_cz1268("./datos/cz1268.mtx")
-    # P = read_data("./datos/minnesota2642.mtx")
-    P = read_data("./datos/hollins6012.mtx")
-    # P = read_data("./datos/stanford9914.mtx")
+    # P = read_data_minnesota("./datos/minnesota2642.mtx")
+    # P = read_data("./datos/hollins6012.mtx")
+    P = read_data("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
 
-    # P = np.array([[1/2, 1/3, 0, 0],
-    #               [0, 1/3, 0, 1],
-    #               [0, 1/3, 1/2, 0],
-    #               [1/2, 0, 1/2, 0]])
 
-    alpha = 0.99
+
+    alpha = 0.999
 
     M = modificarMatriz(P, alpha)
 
     N = len(P)
-    # Primero formateamos nuestro problema a la forma Ax=b
+
     # Nuestro sistema es de la forma (I-alphaP)x = (1-alpha)v
 
     # Nuestro vector b, que en nuestro caso es (1-alpha)v
@@ -156,13 +153,10 @@ if __name__ == "__main__":
     A = np.eye(N) - np.dot(alpha, P)
 
     # Necesitamos un vector inicial x_0
-    # x_0 = np.random.rand(N)
-    # x_0 = x_0 / np.linalg.norm(x_0, ord=1)
-
     x_0 = np.ones(N)/N
 
 
-    tol = 1e-5
+    tol = 1e-10
     m=3
     max_it = 10000
 
@@ -181,8 +175,9 @@ if __name__ == "__main__":
     end_time1 = time.time()
     elapsed_time1 = end_time1 - start_time1
 
-    # print("DIFERENCIAS", diferencias)
+    print("DIFERENCIAS", diferencias)
     print("TIEMPO", elapsed_time1)
-    # print("SOLUCION", x_n)
+    print("SOLUCION", x_n)
 
+    # Para coger los datos más fácilmente en el excel
     guardar_diferencias_txt(diferencias, "gmres_reiniciado.txt")

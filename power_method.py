@@ -6,8 +6,7 @@ import numpy as np
 from funciones_comunes import (arreglarNodosColgantes, modificarMatriz,
                                multiplicacionMatrizVector,
                                obtenerSolucionPython, residuoDosVectores)
-from read_data import (read_data, read_data_cz1268, read_data_hollins,
-                       read_data_minnesota)
+from read_data import read_data, read_data_cz1268, read_data_minnesota
 
 
 # Método de las potencias estándar, calculando la convergencia con la norma 1
@@ -60,30 +59,17 @@ def power_method_convergence(matrix, vector, max_iterations, tolerance):
 
     return vector, i
 
-def obtenerComparacionesNumpy(M, x):
-
-    vector_solucion_python = obtenerSolucionPython(M)
-    print(vector_solucion_python)
-    norma = residuoDosVectores(vector_solucion_python, x)
-
-    return norma
-
 
 
 if __name__ == "__main__":
 
-    # P = read_data_cz1268("./datos/cz1268.mtx")
-    # P = read_data_minnesota("./datos/minnesota2642.mtx")
-    P = read_data_hollins("./datos/hollins6012.mtx")
-    # P = read_data_hollins("./datos/stanford9914.mtx")
+    P = read_data_minnesota("./datos/minnesota2642.mtx")
+    # P = read_data("./datos/hollins6012.mtx")
+    # P = read_data("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
 
-    # P = np.array([[1/2, 1/3, 0, 0],
-    #               [0, 1/3, 0, 1],
-    #               [0, 1/3, 1/2, 0],
-    #               [1/2, 0, 1/2, 0]])
-    
-    alpha = 0.95
+
+    alpha = 0.85
     M = modificarMatriz(P, alpha)
 
     N = len(M)
@@ -94,18 +80,10 @@ if __name__ == "__main__":
     tol=1e-8
 
     start_time1 = time.time()
-    eigenvector1, num_it1 = power_method(M, x_0, max_it, tol)
+    eigenvector1, num_it1 = power_method_convergence(M, x_0, max_it, tol)
     end_time1 = time.time()
     elapsed_time1 = end_time1 - start_time1
-
-    # norma = obtenerComparacionesNumpy(M, eigenvector1)
 
 
     print("El tiempo de ejecución de POWER BÁSICO fue de: {:.5f} segundos".format(elapsed_time1))
     print("Número de iteraciones:", num_it1)
-    # print("Norma residual", norma)
-    # print("Vector solución", eigenvector1)
-
-    siguiente = np.dot(M, eigenvector1)
-    diferencia = residuoDosVectores(eigenvector1, siguiente/np.linalg.norm(siguiente, ord=1))
-    print("diferencia", diferencia)

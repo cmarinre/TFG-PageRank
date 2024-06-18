@@ -7,14 +7,16 @@ import numpy as np
 from funciones_comunes import (arreglarNodosColgantes, guardar_diferencias_txt,
                                modificarMatriz, obtenerSolucionPython,
                                residuoDosVectores)
-from read_data import read_data, read_data_prueba
+from read_data import read_data, read_data_minnesota
 
 
+# Implementación del método GMRES incluyendo un hilo para medir las diferencias
+# a lo largo del tiempo. 
 def GMRES(A, b, x_0, max_it, tol, vector_solucion_python):
     x = copy.deepcopy(x_0)
     diferencias = []
     tiempo_inicio = time.time()  # Guardamos el tiempo de inicio de la ejecución del método
-    lock = threading.Lock()  # Crear un lock para manejar la sincronización entre hilos
+    lock = threading.Lock()  # Crear un bloqueo para manejar la sincronización entre hilos
     intervalo_registro = 1.0  # Intervalo de tiempo en segundos entre registros
     ultimo_registro = [time.time()]  # Usamos una lista para permitir modificación dentro del hilo
 
@@ -124,22 +126,18 @@ def apply_givens_rotation(h, c, s, k, i):
 
 if __name__ == "__main__":
 
-    # P = read_data_prueba("./datos/prueba.mtx")
-    P = read_data("./datos/minnesota2642.mtx")
+    P = read_data_minnesota("./datos/minnesota2642.mtx")
     # P = read_data("./datos/hollins6012.mtx")
     # P = read_data("./datos/stanford9914.mtx")
     P = arreglarNodosColgantes(P)
 
-    # P = np.array([[1/2, 1/3, 0, 0],
-    #               [0, 1/3, 0, 1],
-    #               [0, 1/3, 1/2, 0],
-    #               [1/2, 0, 1/2, 0]])
 
     alpha = 0.95
 
     M = modificarMatriz(P, alpha)
 
     N = len(P)
+
     # Primero formateamos nuestro problema a la forma Ax=b
     # Nuestro sistema es de la forma (I-alphaP)x = (1-alpha)v
 
@@ -151,9 +149,6 @@ if __name__ == "__main__":
     A = np.eye(N) - np.dot(alpha, P)
 
     # Necesitamos un vector inicial x_0
-    # x_0 = np.random.rand(N)
-    # x_0 = x_0 / np.linalg.norm(x_0, ord=1)
-
     x_0 = np.ones(N)/N
 
 
@@ -176,8 +171,9 @@ if __name__ == "__main__":
     end_time1 = time.time()
     elapsed_time1 = end_time1 - start_time1
 
-    # print("DIFERENCIAS", diferencias)
+    print("DIFERENCIAS", diferencias)
     print("TIEMPO", elapsed_time1)
-    # print("SOLUCION", x_n)
+    print("SOLUCION", x_n)
 
+    # Para coger los datos más fácilmente en el excel
     guardar_diferencias_txt(diferencias, "gmres.txt")
